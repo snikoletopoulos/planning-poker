@@ -4,17 +4,17 @@ import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export type User = {
+export interface User {
 	id: string;
 	name: string;
 	email: string;
 	profilePicture?: string;
 	createdAt: string;
-};
+}
 
 type UserWithPassword = User & { password: string };
 
-type AuthContextType = {
+interface AuthContextType {
 	user: User | null;
 	login: (email: string, password: string) => Promise<boolean>;
 	register: (name: string, email: string, password: string) => Promise<boolean>;
@@ -25,11 +25,11 @@ type AuthContextType = {
 		newPassword: string,
 	) => Promise<boolean>;
 	isLoading: boolean;
-};
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const router = useRouter();

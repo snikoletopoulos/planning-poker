@@ -17,12 +17,12 @@ import { cn } from "@/lib/styles/utils";
 
 const Form = FormProvider;
 
-type FormFieldContextValue<
+interface FormFieldContextValue<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
+> {
 	name: TName;
-};
+}
 
 const FormFieldContext = React.createContext<FormFieldContextValue>(
 	{} as FormFieldContextValue,
@@ -33,13 +33,11 @@ const FormField = <
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
 	...props
-}: ControllerProps<TFieldValues, TName>) => {
-	return (
+}: ControllerProps<TFieldValues, TName>) => (
 		<FormFieldContext.Provider value={{ name: props.name }}>
 			<Controller {...props} />
 		</FormFieldContext.Provider>
 	);
-};
 
 const useFormField = () => {
 	const fieldContext = React.useContext(FormFieldContext);
@@ -64,9 +62,9 @@ const useFormField = () => {
 	};
 };
 
-type FormItemContextValue = {
+interface FormItemContextValue {
 	id: string;
-};
+}
 
 const FormItemContext = React.createContext<FormItemContextValue>(
 	{} as FormItemContextValue,

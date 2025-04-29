@@ -16,19 +16,19 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRooms } from "@/contexts/room-context";
 
 // Define types
-type Participant = {
+interface Participant {
 	id: string;
 	name: string;
 	vote: string | null;
 	isReady: boolean;
 	profilePicture?: string;
-};
+}
 
-type Story = {
+interface Story {
 	id: string;
 	title: string;
 	description: string;
-};
+}
 
 export default function RoomPage() {
 	const params = useParams();

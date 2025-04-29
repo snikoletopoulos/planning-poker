@@ -5,24 +5,24 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { useAuth } from "./auth-context";
 
-export type RoomHistory = {
+export interface RoomHistory {
 	id: string;
 	name: string;
 	createdAt: string;
 	lastVisited: string;
 	stories: number;
 	participants: number;
-};
+}
 
-type RoomContextType = {
+interface RoomContextType {
 	rooms: RoomHistory[];
 	addRoom: (room: Omit<RoomHistory, "lastVisited">) => void;
 	updateRoomVisit: (roomId: string) => void;
-};
+}
 
 const RoomContext = createContext<RoomContextType | undefined>(undefined);
 
-export function RoomProvider({ children }: { children: React.ReactNode }) {
+export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
 	const [rooms, setRooms] = useState<RoomHistory[]>([]);
 	const { user } = useAuth();
 

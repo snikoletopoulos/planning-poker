@@ -17,13 +17,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/auth-context";
 
-export function MainNav() {
+export const MainNav = () => {
 	const { user, logout } = useAuth();
 	const pathname = usePathname();
 
-	const isActive = (path: string) => {
-		return pathname === path;
-	};
+	const isActive = (path: string) => pathname === path;
 
 	return (
 		<header className="bg-background border-b">

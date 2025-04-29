@@ -26,7 +26,7 @@ const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
-type SidebarContext = {
+interface SidebarContext {
 	state: "expanded" | "collapsed";
 	open: boolean;
 	setOpen: (open: boolean) => void;
@@ -34,7 +34,7 @@ type SidebarContext = {
 	setOpenMobile: (open: boolean) => void;
 	isMobile: boolean;
 	toggleSidebar: () => void;
-};
+}
 
 const SidebarContext = React.createContext<SidebarContext | null>(null);
 
@@ -90,9 +90,7 @@ const SidebarProvider = React.forwardRef<
 		);
 
 		// Helper to toggle the sidebar.
-		const toggleSidebar = React.useCallback(() => {
-			return isMobile ? setOpenMobile(open => !open) : setOpen(open => !open);
-		}, [isMobile, setOpen, setOpenMobile]);
+		const toggleSidebar = React.useCallback(() => isMobile ? setOpenMobile(open => !open) : setOpen(open => !open), [isMobile, setOpen, setOpenMobile]);
 
 		// Adds a keyboard shortcut to toggle the sidebar.
 		React.useEffect(() => {
@@ -323,8 +321,7 @@ SidebarRail.displayName = "SidebarRail";
 const SidebarInset = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<"main">
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<main
 			ref={ref}
 			className={cn(
@@ -334,15 +331,13 @@ const SidebarInset = React.forwardRef<
 			)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarInset.displayName = "SidebarInset";
 
 const SidebarInput = React.forwardRef<
 	React.ElementRef<typeof Input>,
 	React.ComponentProps<typeof Input>
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<Input
 			ref={ref}
 			data-sidebar="input"
@@ -352,60 +347,52 @@ const SidebarInput = React.forwardRef<
 			)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarInput.displayName = "SidebarInput";
 
 const SidebarHeader = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<div
 			ref={ref}
 			data-sidebar="header"
 			className={cn("flex flex-col gap-2 p-2", className)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarHeader.displayName = "SidebarHeader";
 
 const SidebarFooter = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<div
 			ref={ref}
 			data-sidebar="footer"
 			className={cn("flex flex-col gap-2 p-2", className)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarFooter.displayName = "SidebarFooter";
 
 const SidebarSeparator = React.forwardRef<
 	React.ElementRef<typeof Separator>,
 	React.ComponentProps<typeof Separator>
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<Separator
 			ref={ref}
 			data-sidebar="separator"
 			className={cn("bg-sidebar-border mx-2 w-auto", className)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarSeparator.displayName = "SidebarSeparator";
 
 const SidebarContent = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<div
 			ref={ref}
 			data-sidebar="content"
@@ -415,23 +402,20 @@ const SidebarContent = React.forwardRef<
 			)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarContent.displayName = "SidebarContent";
 
 const SidebarGroup = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
-	return (
+>(({ className, ...props }, ref) => (
 		<div
 			ref={ref}
 			data-sidebar="group"
 			className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
 			{...props}
 		/>
-	);
-});
+	));
 SidebarGroup.displayName = "SidebarGroup";
 
 const SidebarGroupLabel = React.forwardRef<
@@ -657,9 +641,7 @@ const SidebarMenuSkeleton = React.forwardRef<
 	}
 >(({ className, showIcon = false, ...props }, ref) => {
 	// Random width between 50 to 90%.
-	const width = React.useMemo(() => {
-		return `${Math.floor(Math.random() * 40) + 50}%`;
-	}, []);
+	const width = React.useMemo(() => `${Math.floor(Math.random() * 40) + 50}%`, []);
 
 	return (
 		<div

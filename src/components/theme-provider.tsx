@@ -21,13 +21,13 @@ interface ThemeProviderProps {
 	storageKey?: string;
 }
 
-function ThemeProvider({
+const ThemeProvider = ({
 	children,
 	attribute = "class",
 	defaultTheme = "system",
 	enableSystem = true,
 	storageKey = "vite-ui-theme",
-}: ThemeProviderProps) {
+}: ThemeProviderProps) => {
 	const [theme, setTheme] = React.useState<Theme>(defaultTheme);
 
 	React.useEffect(() => {
