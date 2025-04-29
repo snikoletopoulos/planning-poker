@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 
-export default function ProfilePage() {
+const ProfilePage = () => {
 	const { user, updateProfile, isLoading: authLoading } = useAuth();
 	const router = useRouter();
 	const [name, setName] = useState(user?.name || "");
@@ -186,4 +186,6 @@ export default function ProfilePage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default ProfilePage;

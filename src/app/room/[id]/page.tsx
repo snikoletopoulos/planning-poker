@@ -30,7 +30,7 @@ interface Story {
 	description: string;
 }
 
-export default function RoomPage() {
+const RoomPage = () => {
 	const params = useParams();
 	const router = useRouter();
 	const roomId = params.id as string;
@@ -387,4 +387,6 @@ export default function RoomPage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default RoomPage;

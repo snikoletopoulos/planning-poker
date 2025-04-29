@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function NewRoomPage() {
+const NewRoomPage = () => {
 	const router = useRouter();
 	const [roomName, setRoomName] = useState("");
 	const [yourName, setYourName] = useState("");
@@ -165,4 +165,6 @@ export default function NewRoomPage() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default NewRoomPage;

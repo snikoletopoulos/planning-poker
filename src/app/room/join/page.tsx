@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function JoinRoomPage() {
+const JoinRoomPage = () => {
 	const router = useRouter();
 	const [roomCode, setRoomCode] = useState("");
 	const [yourName, setYourName] = useState("");
@@ -80,4 +80,6 @@ export default function JoinRoomPage() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default JoinRoomPage;

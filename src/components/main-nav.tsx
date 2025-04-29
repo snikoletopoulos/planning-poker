@@ -115,4 +115,4 @@ export const MainNav = () => {
 			</div>
 		</header>
 	);
-}
+};

@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 
-export default function SecurityPage() {
+const SecurityPage = () => {
 	const { user, updatePassword, isLoading: authLoading } = useAuth();
 	const router = useRouter();
 	const [currentPassword, setCurrentPassword] = useState("");
@@ -167,4 +167,6 @@ export default function SecurityPage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default SecurityPage;

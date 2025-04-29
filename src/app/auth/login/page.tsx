@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 
-export default function LoginPage() {
+const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
@@ -115,4 +115,6 @@ export default function LoginPage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default LoginPage;

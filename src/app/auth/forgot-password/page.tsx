@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function ForgotPasswordPage() {
+const ForgotPasswordPage = () => {
 	const [email, setEmail] = useState("");
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -97,4 +97,6 @@ export default function ForgotPasswordPage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default ForgotPasswordPage;

@@ -16,16 +16,16 @@ export const metadata: Metadata = {
 	generator: "v0.dev",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={inter.className}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<AuthProvider>
-						<RoomProvider>{children}</RoomProvider>
-					</AuthProvider>
-				</ThemeProvider>
-			</body>
-		</html>
-	);
-}
+const RootLayout = ({ children }: { children: ReactNode }) => (
+	<html lang="en" suppressHydrationWarning>
+		<body className={inter.className}>
+			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+				<AuthProvider>
+					<RoomProvider>{children}</RoomProvider>
+				</AuthProvider>
+			</ThemeProvider>
+		</body>
+	</html>
+);
+
+export default RootLayout;

@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import { useRooms } from "@/contexts/room-context";
 
-export default function DashboardPage() {
+const DashboardPage = () => {
 	const { user, isLoading: authLoading } = useAuth();
 	const { rooms } = useRooms();
 	const router = useRouter();
@@ -187,4 +187,6 @@ export default function DashboardPage() {
 			</div>
 		</>
 	);
-}
+};
+
+export default DashboardPage;
