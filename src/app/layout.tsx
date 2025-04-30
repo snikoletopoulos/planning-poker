@@ -12,9 +12,11 @@ import { RoomProvider } from "@/contexts/room-context";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Planning Poker",
+	title: {
+		template: "%s | Planning Poker",
+		default: "Planning Poker",
+	},
 	description: "Estimate your tasks collaboratively with your team",
-	generator: "v0.dev",
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => (
