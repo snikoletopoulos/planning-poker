@@ -2,14 +2,15 @@
 
 import { Moon, Sun } from "lucide-react";
 
-import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
+import { useTheme, type Theme } from "@/components/ThemeContext";
+import { Button } from "@/components/ui/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/DropdownMenu";
 
 export const ThemeToggle = () => {
 	const { setTheme, theme } = useTheme();
@@ -24,17 +25,14 @@ export const ThemeToggle = () => {
 			</DropdownMenuTrigger>
 
 			<DropdownMenuContent align="end">
-				<DropdownMenuItem onClick={() => setTheme("light")}>
-					Light
-				</DropdownMenuItem>
-
-				<DropdownMenuItem onClick={() => setTheme("dark")}>
-					Dark
-				</DropdownMenuItem>
-
-				<DropdownMenuItem onClick={() => setTheme("system")}>
-					System
-				</DropdownMenuItem>
+				<DropdownMenuRadioGroup
+					value={theme}
+					onValueChange={newTheme => setTheme(newTheme as Theme)}
+				>
+					<DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
