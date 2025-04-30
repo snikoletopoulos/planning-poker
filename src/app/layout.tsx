@@ -5,9 +5,8 @@ import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 
 import { NavBar } from "@/components/NavBar";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/ThemeContext";
 import { AuthProvider } from "@/contexts/auth-context";
-import { RoomProvider } from "@/contexts/room-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,10 +23,8 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
 		<body className={inter.className}>
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 				<AuthProvider>
-					<RoomProvider>
-						<NavBar />
-						{children}
-					</RoomProvider>
+					<NavBar />
+					{children}
 				</AuthProvider>
 			</ThemeProvider>
 		</body>
