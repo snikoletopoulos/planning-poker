@@ -1,24 +1,24 @@
 import { ArrowLeft } from "lucide-react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import {
 	Card,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/Card";
 import { db } from "@/lib/db";
 import {
 	members,
-	NewStory,
 	rooms,
 	stories as storiesTable,
+	type NewStory,
 } from "@/lib/db/schema";
 import {
 	CreateRoomForm,
-	CreateRoomFormData,
+	type CreateRoomFormData,
 } from "./_components/CreateRoomForm";
 
 export const metadata: Metadata = {

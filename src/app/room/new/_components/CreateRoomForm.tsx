@@ -11,12 +11,12 @@ import {
 } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
-import { CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Member, Room } from "@/lib/db/schema";
+import { Button } from "@/components/ui/Button";
+import { CardContent, CardFooter } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/Textarea";
+import type { Member, Room } from "@/lib/db/schema";
 
 const CreateRoomSchema = z.object({
 	roomName: z.string().min(1, "Room name is required"),
@@ -48,7 +48,7 @@ export const CreateRoomForm = ({
 }: {
 	onSubmitAction: (data: z.infer<typeof CreateRoomSchema>) => Promise<{
 		room: Room;
-		user: Member
+		user: Member;
 	}>;
 }) => {
 	const router = useRouter();
@@ -154,10 +154,10 @@ export const CreateRoomForm = ({
 	);
 };
 
-const StoryInput = ({
+export const StoryInput = ({
 	onRemove,
 	index,
-	showDeleteButton,
+	showDeleteButton = false,
 }: {
 	onRemove: () => void;
 	index: number;
