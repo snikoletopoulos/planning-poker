@@ -25,6 +25,7 @@ export const stories = sqliteTable("stories", {
 	title: text().notNull(),
 	description: text(),
 	createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
+	isCompleted: int({ mode: "boolean" }).default(false),
 	roomId: int()
 		.notNull()
 		.references(() => rooms.id),
