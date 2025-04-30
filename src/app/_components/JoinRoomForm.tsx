@@ -18,11 +18,14 @@ import {
 } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
+import type { Room } from "@/lib/db/schema";
 
 export const JoinRoomForm = ({
 	onSubmitAction,
 }: {
-	onSubmitAction: (data: z.infer<typeof JoinRoomSchema>) => Promise<void>;
+	onSubmitAction: (
+		data: z.infer<typeof JoinRoomSchema>,
+	) => Promise<{ room: Room }>;
 }) => {
 	const router = useRouter();
 
@@ -40,7 +43,7 @@ export const JoinRoomForm = ({
 			const result = await onSubmitAction(data);
 
 			// TODO: Register user for room
-			// router.push(`/room/${result.room.id}`);
+			router.push(`/room/${result.room.id}`);
 		} catch (error) {
 			console.log("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
@@ -104,3 +107,5 @@ const JoinRoomSchema = z.object({
 	roomCode: z.string().min(1, "Room code is required"),
 	name: z.string().min(1, "Name is required"),
 });
+
+export type JoinRoomFormData = z.infer<typeof JoinRoomSchema>;
