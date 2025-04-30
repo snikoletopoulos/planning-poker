@@ -50,8 +50,11 @@ export const members = sqliteTable("members", {
 export type Member = InferSelectModel<typeof members>;
 export type NewMember= InferInsertModel<typeof members>;
 
-export const memberRelations = relations(members, ({ many }) => ({
-	rooms: many(rooms),
+export const memberRelations = relations(members, ({ many, one }) => ({
+	rooms: one(rooms, {
+		fields: [members.roomId],
+		references: [rooms.id],
+	}),
 	votes: many(votes),
 }));
 
