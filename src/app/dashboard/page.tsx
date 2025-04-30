@@ -5,7 +5,7 @@ import { ArrowRight, Clock, Loader2, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { MainNav } from "@/components/main-nav";
+import { NavBar } from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -57,7 +57,7 @@ const DashboardPage = () => {
 	if (authLoading) {
 		return (
 			<>
-				<MainNav />
+				<NavBar />
 				<div className="container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
 					<Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
 				</div>
@@ -67,7 +67,7 @@ const DashboardPage = () => {
 
 	return (
 		<>
-			<MainNav />
+			<NavBar />
 			<div className="container py-12">
 				<div className="mx-auto max-w-6xl">
 					<h1 className="mb-2 text-3xl font-bold">Welcome, {user?.name}</h1>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { MainNav } from "@/components/main-nav";
+import { NavBar } from "@/components/NavBar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,7 +58,7 @@ const RegisterPage = () => {
 
 	return (
 		<>
-			<MainNav />
+			<NavBar />
 			<div className="container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
 				<Card className="mx-auto max-w-sm">
 					<CardHeader>

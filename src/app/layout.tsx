@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 
 import "@/styles/globals.css";
 
+import { NavBar } from "@/components/NavBar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { RoomProvider } from "@/contexts/room-context";
@@ -21,7 +22,10 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
 		<body className={inter.className}>
 			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 				<AuthProvider>
-					<RoomProvider>{children}</RoomProvider>
+					<RoomProvider>
+						<NavBar />
+						{children}
+					</RoomProvider>
 				</AuthProvider>
 			</ThemeProvider>
 		</body>

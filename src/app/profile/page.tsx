@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { MainNav } from "@/components/main-nav";
+import { NavBar } from "@/components/NavBar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -76,7 +76,7 @@ const ProfilePage = () => {
 	if (authLoading) {
 		return (
 			<>
-				<MainNav />
+				<NavBar />
 				<div className="container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
 					<Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
 				</div>
@@ -86,7 +86,7 @@ const ProfilePage = () => {
 
 	return (
 		<>
-			<MainNav />
+			<NavBar />
 			<div className="container py-12">
 				<div className="mx-auto max-w-4xl">
 					<h1 className="mb-6 text-3xl font-bold">Account Settings</h1>
