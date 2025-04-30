@@ -4,4 +4,3 @@ interface SplitNewLinesProps {
 
 export const SplitNewLines = ({ message }: SplitNewLinesProps) =>
 	message.split("\n").map(line => <p key={line}>{line}</p>);
-
