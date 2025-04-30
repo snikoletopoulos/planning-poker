@@ -1,4 +1,8 @@
-import { relations, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
+import {
+	relations,
+	type InferInsertModel,
+	type InferSelectModel,
+} from "drizzle-orm";
 import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const rooms = sqliteTable("rooms", {
@@ -27,7 +31,7 @@ export const stories = sqliteTable("stories", {
 });
 
 export type Story = InferSelectModel<typeof stories>;
-export type NewStory= InferInsertModel<typeof stories>;
+export type NewStory = InferInsertModel<typeof stories>;
 
 export const storyRelations = relations(stories, ({ many, one }) => ({
 	votes: many(votes),
@@ -48,7 +52,7 @@ export const members = sqliteTable("members", {
 });
 
 export type Member = InferSelectModel<typeof members>;
-export type NewMember= InferInsertModel<typeof members>;
+export type NewMember = InferInsertModel<typeof members>;
 
 export const memberRelations = relations(members, ({ many, one }) => ({
 	rooms: one(rooms, {
@@ -74,7 +78,7 @@ export const votes = sqliteTable(
 );
 
 export type Vote = InferSelectModel<typeof votes>;
-export type NewVote= InferInsertModel<typeof votes>;
+export type NewVote = InferInsertModel<typeof votes>;
 
 export const voteRelations = relations(votes, ({ one }) => ({
 	members: one(members, {
