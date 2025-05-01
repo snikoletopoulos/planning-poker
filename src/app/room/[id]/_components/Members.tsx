@@ -2,6 +2,8 @@
 
 import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
 import { Card, CardContent } from "@/components/ui/Card";
+import { USER_ID } from "@/data";
+import { cn } from "@/lib/styles/utils";
 import { useRoom } from "./RoomContext";
 
 export const Members = () => {
@@ -15,43 +17,44 @@ export const Members = () => {
 
 				<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 					{members.map(member => {
-						const vote = activeStory.votes.find(
+						const voteData = activeStory.votes.find(
 							v => v.memberId === member.id,
-						)?.vote;
+						);
+
+						let vote: number | "?" | null = null;
+						if (voteData) {
+							vote = voteData.vote ?? "?";
+						}
 
 						return (
 							<div key={member.id} className="flex flex-col items-center">
 								<div className="relative">
 									<Avatar className="h-16 w-16">
 										<AvatarFallback className="bg-muted text-muted-foreground">
-											{member.name.substring(0, 2).toUpperCase()}
+											{showVotes
+												? (vote ?? "X")
+												: member.name.substring(0, 2).toUpperCase()}
 										</AvatarFallback>
 									</Avatar>
 
-									{vote && (
+									{vote && !showVotes && (
 										<div
-											className={`absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+											className={cn(
+												"absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
 												showVotes
 													? "bg-primary/20 text-primary border-primary/30 border-2"
-													: "bg-muted text-muted-foreground border-border border-2"
-											}`}
+													: "bg-muted text-muted-foreground border-border border-2",
+											)}
 										>
-											{showVotes ? vote : "✓"}
+											✓
 										</div>
 									)}
 								</div>
 
 								<span className="mt-2 text-sm font-medium">
 									{member.name}
-									{/* TODO */}
-									{/* {member.id === user?.id && " (You)"} */}
+									{member.id === USER_ID && " (You)"}
 								</span>
-
-								{showVotes && vote && (
-									<span className="text-primary mt-1 text-sm font-medium">
-										Voted: {vote}
-									</span>
-								)}
 							</div>
 						);
 					})}
