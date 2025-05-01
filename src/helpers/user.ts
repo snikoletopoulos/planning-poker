@@ -7,7 +7,7 @@ import { createToken, parseToken } from "@/lib/jwt";
 
 export const getCurrentUser = async (roomId: Room["id"]) => {
 	const cookieStore = await cookies();
-	const token = cookieStore.get(roomId.toString())?.value;
+	const token = cookieStore.get(roomId)?.value;
 	if (!token) return null;
 	return parseToken(token);
 };
@@ -29,7 +29,7 @@ export const createNewUser = async (
 
 	const cookieStore = await cookies();
 	cookieStore.set({
-		name: roomId.toString(),
+		name: roomId,
 		value: newToken,
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
