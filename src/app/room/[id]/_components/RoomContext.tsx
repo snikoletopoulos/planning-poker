@@ -54,7 +54,6 @@ export const RoomProvider = ({
 			setActiveStory(story);
 
 			const userVote = story.votes.find(vote => vote.memberId === USER_ID);
-			console.log("🪚 userVote:", userVote);
 			if (!userVote) {
 				setSelectedCard(null);
 				return;
