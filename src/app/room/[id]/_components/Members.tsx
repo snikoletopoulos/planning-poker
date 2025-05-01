@@ -1,12 +1,13 @@
 "use client";
 
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
 import { Card, CardContent } from "@/components/ui/Card";
-import { USER_ID } from "@/data";
 import { cn } from "@/lib/styles/utils";
 import { useRoom } from "./RoomContext";
 
 export const Members = () => {
+	const currentUser = useCurrentUser();
 	const { members, activeStory } = useRoom();
 	const showVotes = activeStory.isCompleted;
 
@@ -53,7 +54,7 @@ export const Members = () => {
 
 								<span className="mt-2 text-sm font-medium">
 									{member.name}
-									{member.id === USER_ID && " (You)"}
+									{member.id === currentUser.id && " (You)"}
 								</span>
 							</div>
 						);

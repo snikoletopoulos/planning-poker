@@ -9,7 +9,7 @@ import {
 	type PropsWithChildren,
 } from "react";
 
-import { USER_ID } from "@/data";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import type { Member, Room, Story, Vote } from "@/lib/db/schema";
 import {
 	completeStory as completeStoryAction,
@@ -43,6 +43,8 @@ export const RoomProvider = ({
 	stories: StoryWithVotes[];
 	members: Member[];
 }>) => {
+	const currentUser = useCurrentUser();
+
 	const [activeStory, setActiveStory] = useState(stories[0]);
 	const [selectedCard, setSelectedCard] = useState<number | "?" | null>(null);
 
@@ -53,14 +55,16 @@ export const RoomProvider = ({
 
 			setActiveStory(story);
 
-			const userVote = story.votes.find(vote => vote.memberId === USER_ID);
+			const userVote = story.votes.find(
+				vote => vote.memberId === currentUser.id,
+			);
 			if (!userVote) {
 				setSelectedCard(null);
 				return;
 			}
 			setSelectedCard(userVote.vote ? +userVote.vote : "?");
 		},
-		[stories],
+		[stories, currentUser],
 	);
 
 	const selectCard = useCallback(

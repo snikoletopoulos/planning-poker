@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
 	relations,
 	type InferInsertModel,
@@ -6,7 +7,9 @@ import {
 import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const rooms = sqliteTable("rooms", {
-	id: int().primaryKey({ autoIncrement: true }),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	name: text().notNull(),
 	createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
 	isActive: int({ mode: "boolean" }).default(true),
@@ -21,12 +24,14 @@ export const roomRelations = relations(rooms, ({ many }) => ({
 }));
 
 export const stories = sqliteTable("stories", {
-	id: int().primaryKey({ autoIncrement: true }),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	title: text().notNull(),
 	description: text(),
 	createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
 	isCompleted: int({ mode: "boolean" }).default(false),
-	roomId: int()
+	roomId: text()
 		.notNull()
 		.references(() => rooms.id),
 });
@@ -43,9 +48,11 @@ export const storyRelations = relations(stories, ({ many, one }) => ({
 }));
 
 export const members = sqliteTable("members", {
-	id: int().primaryKey({ autoIncrement: true }),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	name: text().notNull(),
-	roomId: int()
+	roomId: text()
 		.notNull()
 		.references(() => rooms.id),
 	accessToken: text().notNull(),
@@ -66,10 +73,10 @@ export const memberRelations = relations(members, ({ many, one }) => ({
 export const votes = sqliteTable(
 	"votes",
 	{
-		memberId: int()
+		memberId: text()
 			.notNull()
 			.references(() => members.id),
-		storyId: int()
+		storyId: text()
 			.notNull()
 			.references(() => stories.id),
 		vote: int(),

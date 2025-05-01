@@ -2,7 +2,7 @@
 
 import { and, eq } from "drizzle-orm";
 
-import { USER_ID } from "@/data";
+import { getCurrentUser } from "@/helpers/user";
 import { db } from "@/lib/db";
 import { stories, votes, type Room, type Story } from "@/lib/db/schema";
 import type { AddStoryData } from "../_components/StoriesSidebar";
@@ -18,6 +18,8 @@ export const addStory = async ({
 		description,
 		isCompleted: false,
 	});
+
+	// TODO: Send story to websocket
 };
 
 export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
@@ -25,6 +27,8 @@ export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
 		.update(stories)
 		.set({ isCompleted: true })
 		.where(eq(stories.id, storyId));
+
+	// TODO: Send completeness to websocket
 };
 
 export const voteForStory = async ({
@@ -41,8 +45,10 @@ export const voteForStory = async ({
 
 	if (!story) throw new Error("Story not found");
 	if (story.isCompleted) throw new Error("Story is already completed");
+	const user = await getCurrentUser(story.roomId);
+	if (!user) throw new Error("Unauthorized");
 
-	const existingVote = story.votes.find(vote => vote.memberId === USER_ID);
+	const existingVote = story.votes.find(vote => vote.memberId === user.id);
 	if (existingVote) {
 		await db
 			.update(votes)
@@ -53,12 +59,13 @@ export const voteForStory = async ({
 					eq(votes.storyId, existingVote.storyId),
 				),
 			);
-		return;
+	} else {
+		await db.insert(votes).values({
+			memberId: user.id,
+			storyId,
+			vote: typeof vote === "number" ? vote : null,
+		});
 	}
 
-	await db.insert(votes).values({
-		memberId: USER_ID,
-		storyId,
-		vote: typeof vote === "number" ? vote : null,
-	});
+	// TODO: Send vote to websocket
 };
