@@ -3,7 +3,6 @@
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
 import { Card, CardContent } from "@/components/ui/Card";
-import { cn } from "@/lib/styles/utils";
 import { useRoom } from "./RoomContext";
 
 export const Members = () => {
@@ -39,14 +38,7 @@ export const Members = () => {
 									</Avatar>
 
 									{vote && !showVotes && (
-										<div
-											className={cn(
-												"absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
-												showVotes
-													? "bg-primary/20 text-primary border-primary/30 border-2"
-													: "bg-muted text-muted-foreground border-border border-2",
-											)}
-										>
+										<div className="bg-muted text-muted-foreground border-border absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-bold">
 											✓
 										</div>
 									)}

@@ -1,9 +1,10 @@
 "use client";
 
+import type { Member } from "@/lib/db/schema";
 import { createContext, useContext, type PropsWithChildren } from "react";
 
 export interface CurrentUser {
-	id: number;
+	id: Member["id"];
 	name: string;
 }
 

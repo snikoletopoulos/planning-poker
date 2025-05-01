@@ -20,7 +20,7 @@ export const parseToken = (token: string) => {
 
 // TODO: Add roomId to token
 const TokenSchema = z.object({
-	id: z.number(),
+	id: z.string(),
 	name: z.string(),
 	roomId: z.number(),
 });

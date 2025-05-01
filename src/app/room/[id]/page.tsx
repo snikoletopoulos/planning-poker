@@ -10,6 +10,7 @@ import { Members } from "./_components/Members";
 import { RoomProvider } from "./_components/RoomContext";
 import { StoriesSidebar } from "./_components/StoriesSidebar";
 import { VoteCard } from "./_components/VoteCard";
+import type { Room } from "@/lib/db/schema";
 
 interface Params {
 	id: string;
@@ -78,9 +79,9 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 
 export default RoomPage;
 
-const getRoomData = async (roomId: string) => {
+const getRoomData = async (roomId: Room["id"]) => {
 	const room = await db.query.rooms.findFirst({
-		where: (rooms, { eq }) => eq(rooms.id, +roomId),
+		where: (rooms, { eq }) => eq(rooms.id, roomId),
 		with: {
 			members: true,
 			stories: {

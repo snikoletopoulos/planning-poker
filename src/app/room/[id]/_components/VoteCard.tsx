@@ -52,11 +52,7 @@ export const VoteCard = () => {
 				</div>
 
 				<div className="mt-8 flex justify-center gap-8">
-					<Button
-						onClick={completeStory}
-						// TODO
-						disabled={selectedCard == null || !!showVotes}
-					>
+					<Button onClick={completeStory} disabled={!!showVotes}>
 						{showVotes ? (
 							<>
 								<EyeOff className="mr-2 h-5 w-5" />
