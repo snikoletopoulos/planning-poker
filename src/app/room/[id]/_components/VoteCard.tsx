@@ -41,6 +41,7 @@ export const VoteCard = () => {
 											selectedCard === value,
 										"hover:border-primary/50 hover:bg-muted":
 											!activeStory.isCompleted && selectedCard !== value,
+										"bg-muted text-muted-foreground": activeStory.isCompleted,
 									},
 								)}
 							>
