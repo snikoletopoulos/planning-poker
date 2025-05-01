@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { members, type Room } from "@/lib/db/schema";
 import { createToken, parseToken } from "@/lib/jwt";
+import type { Transaction } from "@/types/db";
 
 export const getCurrentUser = async (roomId: Room["id"]) => {
 	const cookieStore = await cookies();
@@ -15,7 +16,7 @@ export const getCurrentUser = async (roomId: Room["id"]) => {
 export const createNewUser = async (
 	name: string,
 	roomId: Room["id"],
-	tx = db,
+	tx: Transaction = db,
 ) => {
 	const userId = createId();
 	const newToken = createToken({ id: userId, name, roomId });
