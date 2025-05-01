@@ -9,7 +9,12 @@ import {
 	type PropsWithChildren,
 } from "react";
 
+import { USER_ID } from "@/data";
 import type { Member, Room, Story, Vote } from "@/lib/db/schema";
+import {
+	completeStory as completeStoryAction,
+	voteForStory,
+} from "../_actions/stories";
 
 interface StoryWithVotes extends Story {
 	votes: Vote[];
@@ -22,7 +27,7 @@ interface RoomContextData {
 	activeStory: StoryWithVotes;
 	changeActiveStory: (storyId: Story["id"]) => void;
 	selectedCard: number | "?" | null;
-	setSelectedCard: (card: number | "?" | null) => void;
+	selectCard: (card: number | "?" | null) => void;
 	completeStory: () => void;
 }
 
@@ -48,15 +53,32 @@ export const RoomProvider = ({
 
 			setActiveStory(story);
 
-			// TODO: set selectedCard if story is completed
-			setSelectedCard(null);
+			const userVote = story.votes.find(vote => vote.memberId === USER_ID);
+			console.log("🪚 userVote:", userVote);
+			if (!userVote) {
+				setSelectedCard(null);
+				return;
+			}
+			setSelectedCard(userVote.vote ? +userVote.vote : "?");
 		},
 		[stories],
 	);
 
-	const completeStory = useCallback(() => {}, []);
+	const selectCard = useCallback(
+		async (card: number | "?" | null) => {
+			setSelectedCard(card);
+			await voteForStory({
+				storyId: activeStory.id,
+				vote: card === "?" ? null : card,
+			});
+		},
+		[activeStory.id],
+	);
 
-	stories[0].isCompleted = true;
+	const completeStory = useCallback(
+		async () => await completeStoryAction({ storyId: activeStory.id }),
+		[activeStory.id],
+	);
 
 	const value = useMemo(
 		() => ({
@@ -66,7 +88,7 @@ export const RoomProvider = ({
 			activeStory,
 			changeActiveStory,
 			selectedCard,
-			setSelectedCard,
+			selectCard,
 			completeStory,
 		}),
 		[
@@ -76,7 +98,7 @@ export const RoomProvider = ({
 			activeStory,
 			changeActiveStory,
 			selectedCard,
-			setSelectedCard,
+			selectCard,
 			completeStory,
 		],
 	);
