@@ -23,9 +23,7 @@ import type { Room } from "@/lib/db/schema";
 export const JoinRoomForm = ({
 	onSubmitAction,
 }: {
-	onSubmitAction: (
-		data: z.infer<typeof JoinRoomSchema>,
-	) => Promise<{ room: Room }>;
+	onSubmitAction: (data: z.infer<typeof JoinRoomSchema>) => Promise<Room["id"]>;
 }) => {
 	const router = useRouter();
 
@@ -40,12 +38,10 @@ export const JoinRoomForm = ({
 
 	const handleJoinRoom = handleSubmit(async data => {
 		try {
-			const result = await onSubmitAction(data);
-
-			// TODO: Register user for room
-			router.push(`/room/${result.room.id}`);
+			const roomId = await onSubmitAction(data);
+			router.push(`/room/${roomId}`);
 		} catch (error) {
-			console.log("[CREATE_ROOM:SUBMIT]", error);
+			console.error("[JOIN_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
 		}
 	});
