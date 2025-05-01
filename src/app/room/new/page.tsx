@@ -9,13 +9,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/Card";
+import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";
-import {
-	members,
-	rooms,
-	stories as storiesTable,
-	type NewStory,
-} from "@/lib/db/schema";
+import { rooms, stories as storiesTable, type NewStory } from "@/lib/db/schema";
 import {
 	CreateRoomForm,
 	type CreateRoomFormData,
@@ -45,16 +41,7 @@ const NewRoomPage = () => {
 
 			if (!roomsResult[0]) tx.rollback();
 
-			const usersResult = await tx
-				.insert(members)
-				.values({
-					name,
-					roomId: roomsResult[0].id,
-					accessToken: "123456",
-				})
-				.returning();
-
-			if (!usersResult[0]) tx.rollback();
+			await createNewUser(name, roomsResult[0].id, tx);
 
 			const storiesData = stories.map(
 				({ title, description }) =>
@@ -67,7 +54,7 @@ const NewRoomPage = () => {
 
 			await tx.insert(storiesTable).values(storiesData);
 
-			return { room: roomsResult[0], user: usersResult[0] };
+			return roomsResult[0].id;
 		});
 	};
 

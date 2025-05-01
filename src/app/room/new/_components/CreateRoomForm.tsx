@@ -16,7 +16,7 @@ import { CardContent, CardFooter } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
-import type { Member, Room } from "@/lib/db/schema";
+import type { Room } from "@/lib/db/schema";
 
 const CreateRoomSchema = z.object({
 	roomName: z.string().min(1, "Room name is required"),
@@ -46,10 +46,9 @@ const { formControl, register, handleSubmit, control, setError } =
 export const CreateRoomForm = ({
 	onSubmitAction,
 }: {
-	onSubmitAction: (data: z.infer<typeof CreateRoomSchema>) => Promise<{
-		room: Room;
-		user: Member;
-	}>;
+	onSubmitAction: (
+		data: z.infer<typeof CreateRoomSchema>,
+	) => Promise<Room["id"]>;
 }) => {
 	const router = useRouter();
 
@@ -68,10 +67,8 @@ export const CreateRoomForm = ({
 
 	const handleCreateRoom = handleSubmit(async data => {
 		try {
-			const result = await onSubmitAction(data);
-
-			// TODO: Register user for room
-			router.push(`/room/${result.room.id}`);
+			const roomId = await onSubmitAction(data);
+			router.push(`/room/${roomId}`);
 		} catch (error) {
 			console.log("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
