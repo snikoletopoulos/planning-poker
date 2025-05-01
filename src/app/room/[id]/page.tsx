@@ -1,6 +1,9 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { db } from "@/lib/db";
+import { parseToken } from "@/lib/jwt";
 import type { GenerateMetadata, PageProps } from "@/types/components";
 import { Header } from "./_components/Header";
 import { Members } from "./_components/Members";
@@ -39,23 +42,35 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 		notFound();
 	}
 
+	const userCookie = (await cookies()).get(room.id.toString());
+	const user = userCookie ? parseToken(userCookie.value) : null;
+	console.log("🪚 userCookie:", userCookie);
+
+	if (!user) notFound();
+
 	return (
 		<div className="bg-background min-h-[calc(100vh-4rem)] p-4">
 			<div className="mx-auto max-w-6xl">
-				<RoomProvider room={room} stories={room.stories} members={room.members}>
-					<Header />
+				<CurrentUserProvider user={user}>
+					<RoomProvider
+						room={room}
+						stories={room.stories}
+						members={room.members}
+					>
+						<Header />
 
-					<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-						<div className="space-y-6 lg:col-span-2">
-							<VoteCard />
-							<Members />
-						</div>
+						<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+							<div className="space-y-6 lg:col-span-2">
+								<VoteCard />
+								<Members />
+							</div>
 
-						<div>
-							<StoriesSidebar />
+							<div>
+								<StoriesSidebar />
+							</div>
 						</div>
-					</div>
-				</RoomProvider>
+					</RoomProvider>
+				</CurrentUserProvider>
 			</div>
 		</div>
 	);
