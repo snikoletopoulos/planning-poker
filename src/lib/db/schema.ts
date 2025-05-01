@@ -72,7 +72,7 @@ export const votes = sqliteTable(
 		storyId: int()
 			.notNull()
 			.references(() => stories.id),
-		vote: text().notNull(),
+		vote: int(),
 		createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
 	},
 	t => [primaryKey({ columns: [t.memberId, t.storyId] })],
