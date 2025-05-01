@@ -14,7 +14,6 @@ export const createToken = (payload: {
 export const parseToken = (token: string) => {
 	const tokenData = verify(token, SECRET);
 	if (!tokenData) return null;
-	console.log("🪚 tokenData:", tokenData);
 
 	const data = TokenSchema.parse(tokenData);
 	return data;
@@ -23,5 +22,5 @@ export const parseToken = (token: string) => {
 const TokenSchema = z.object({
 	id: z.string(),
 	name: z.string(),
-	roomId: z.number(),
+	roomId: z.string(),
 });
