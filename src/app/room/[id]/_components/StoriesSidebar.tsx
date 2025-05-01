@@ -10,7 +10,8 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { addStory } from "../_actions/AddStory";
+import { cn } from "@/lib/styles/utils";
+import { addStory } from "../_actions/stories";
 import { useRoom } from "./RoomContext";
 
 export const StoriesSidebar = () => (
@@ -35,20 +36,48 @@ const StoryList = () => {
 
 	return (
 		<Card>
-			<CardContent className="space-y-2 p-4">
-				{stories.map(story => (
-					<div
-						key={story.id}
-						className={`hover:bg-muted cursor-pointer rounded-md p-3 ${activeStory.id === story.id ? "bg-muted border-border border" : ""}`}
-						onClick={() => changeActiveStory(story.id)}
-					>
-						<h4 className="font-medium">{story.title}</h4>
+			<CardContent className="space-y-4 p-4">
+				{stories.map(story => {
+					const calculateAverage = () => {
+						const numericVotes = story.votes.reduce((acc, { vote }) => {
+							if (vote == null) return acc;
+							if (isNaN(+vote)) return acc;
+							acc.push(+vote);
+							return acc;
+						}, [] as number[]);
 
-						<p className="text-muted-foreground truncate text-sm">
-							{story.description}
-						</p>
-					</div>
-				))}
+						if (numericVotes.length === 0) return "N/A";
+
+						const sum = numericVotes.reduce((acc, vote) => acc + vote, 0);
+						return (sum / numericVotes.length).toFixed(1);
+					};
+
+					return (
+						<button
+							key={story.id}
+							className={cn(
+								"flex w-full cursor-pointer items-center justify-between rounded-md p-3",
+								{
+									"bg-primary text-primary-foreground border-border border":
+										activeStory.id === story.id,
+									"hover:bg-muted": activeStory.id !== story.id,
+									"bg-muted": !activeStory.isCompleted && story.isCompleted,
+								},
+							)}
+							onClick={() => changeActiveStory(story.id)}
+						>
+							<div>
+								<h4 className="font-medium">{story.title}</h4>
+
+								<p className="text-muted-foreground truncate text-sm">
+									{story.description}
+								</p>
+							</div>
+
+							{story.isCompleted && <p>{calculateAverage()}</p>}
+						</button>
+					);
+				})}
 			</CardContent>
 		</Card>
 	);
