@@ -12,13 +12,14 @@ export const createToken = (payload: {
 }) => sign(payload, SECRET);
 
 export const parseToken = (token: string) => {
-	const result = verify(token, SECRET);
-	if (!result) return null;
+	const tokenData = verify(token, SECRET);
+	if (!tokenData) return null;
+	console.log("🪚 tokenData:", tokenData);
 
-	return result as z.infer<typeof TokenSchema>;
+	const data = TokenSchema.parse(tokenData);
+	return data;
 };
 
-// TODO: Add roomId to token
 const TokenSchema = z.object({
 	id: z.string(),
 	name: z.string(),
