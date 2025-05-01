@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { db } from "@/lib/db";
+import type { Room } from "@/lib/db/schema";
 import { parseToken } from "@/lib/jwt";
 import type { GenerateMetadata, PageProps } from "@/types/components";
 import { Header } from "./_components/Header";
@@ -10,7 +11,6 @@ import { Members } from "./_components/Members";
 import { RoomProvider } from "./_components/RoomContext";
 import { StoriesSidebar } from "./_components/StoriesSidebar";
 import { VoteCard } from "./_components/VoteCard";
-import type { Room } from "@/lib/db/schema";
 
 interface Params {
 	id: string;
@@ -43,9 +43,15 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 		notFound();
 	}
 
-	const userCookie = (await cookies()).get(room.id.toString());
-	const user = userCookie ? parseToken(userCookie.value) : null;
-	console.log("🪚 userCookie:", userCookie);
+	const cookieStore = await cookies();
+	const userCookie = cookieStore.get(room.id);
+	let user;
+	try {
+		user = userCookie ? parseToken(userCookie.value) : null;
+	} catch (error) {
+		console.error("[ROOM:PARSE_TOKEN]", error);
+		cookieStore.delete(room.id);
+	}
 
 	if (!user) notFound();
 

@@ -1,15 +1,37 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
-import { JoinRoomForm } from "./_components/JoinRoomForm";
+import { createNewUser } from "@/helpers/user";
+import { db } from "@/lib/db";
+import {
+	JoinRoomForm,
+	type JoinRoomFormData,
+} from "./_components/JoinRoomForm";
 
 export const metadata: Metadata = {
 	title: "Join | Planning Poker",
 };
 
 const HomePage = () => {
-	const joinRoom = async () => {
+	const joinRoom = async ({ name, roomCode }: JoinRoomFormData) => {
 		"use server";
-		console.log("🪚 Join room");
+		const room = await db.query.rooms.findFirst({
+			where: (rooms, { eq }) => eq(rooms.id, roomCode),
+			with: { members: true },
+		});
+		if (!room) throw new Error("Room not found");
+
+		const cookieStore = await cookies();
+		const token = cookieStore.get(room.id)?.value;
+		if (token) {
+			const user = room.members.find(member => member.accessToken === token);
+			if (!user) throw new Error("User not found");
+			return room.id;
+		}
+
+		await createNewUser(name, room.id);
+
+		return room.id;
 	};
 
 	return (
