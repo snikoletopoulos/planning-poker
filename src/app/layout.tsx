@@ -6,7 +6,6 @@ import "@/styles/globals.css";
 
 import { NavBar } from "@/components/NavBar";
 import { ThemeProvider } from "@/components/ThemeContext";
-import { AuthProvider } from "@/contexts/auth-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +21,8 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
 	<html lang="en" suppressHydrationWarning>
 		<body className={inter.className}>
 			<ThemeProvider>
-				<AuthProvider>
-					<NavBar />
-					{children}
-				</AuthProvider>
+				<NavBar />
+				{children}
 			</ThemeProvider>
 		</body>
 	</html>
