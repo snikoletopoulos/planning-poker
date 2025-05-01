@@ -12,12 +12,16 @@ export const getCurrentUser = async (roomId: Room["id"]) => {
 	return parseToken(token);
 };
 
-export const createNewUser = async (name: string, roomId: Room["id"]) => {
+export const createNewUser = async (
+	name: string,
+	roomId: Room["id"],
+	tx = db,
+) => {
 	const userId = createId();
 	const newToken = createToken({ id: userId, name, roomId });
 
 	const user = (
-		await db
+		await tx
 			.insert(members)
 			.values({ id: userId, name, roomId, accessToken: newToken })
 			.returning()
