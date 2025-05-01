@@ -70,7 +70,7 @@ export const CreateRoomForm = ({
 			const roomId = await onSubmitAction(data);
 			router.push(`/room/${roomId}`);
 		} catch (error) {
-			console.log("[CREATE_ROOM:SUBMIT]", error);
+			console.error("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
 		}
 	});

@@ -99,7 +99,7 @@ const AddStory = () => {
 		try {
 			await addStory({ ...data, roomId: room.id });
 		} catch (error) {
-			console.log("[CREATE_ROOM:SUBMIT]", error);
+			console.error("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
 		}
 	});
