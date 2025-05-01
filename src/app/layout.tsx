@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: ReactNode }) => (
 	<html lang="en" suppressHydrationWarning>
 		<body className={inter.className}>
-			<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+			<ThemeProvider>
 				<AuthProvider>
 					<NavBar />
 					{children}

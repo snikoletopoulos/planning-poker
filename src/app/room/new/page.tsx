@@ -51,7 +51,6 @@ const NewRoomPage = () => {
 					name,
 					roomId: roomsResult[0].id,
 					accessToken: "123456",
-					createdAt: new Date(),
 				})
 				.returning();
 
