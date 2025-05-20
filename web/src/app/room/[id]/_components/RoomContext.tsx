@@ -4,6 +4,7 @@ import {
 	createContext,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useState,
 	type PropsWithChildren,
@@ -29,6 +30,7 @@ interface RoomContextData {
 	selectedCard: number | "?" | null;
 	selectCard: (card: number | "?" | null) => void;
 	completeStory: () => void;
+	isLiveUpdating: boolean;
 }
 
 const RoomContext = createContext<RoomContextData | null>(null);
@@ -49,6 +51,25 @@ export const RoomProvider = ({
 		() => stories.find(story => !story.isCompleted) ?? stories[0],
 	);
 	const [selectedCard, setSelectedCard] = useState<number | "?" | null>(null);
+	const [isLiveUpdating, setIsLiveUpdating] = useState(false);
+
+	useEffect(() => {
+		const socket = new WebSocket("ws://localhost:8080/");
+
+		socket.addEventListener("open", () => setIsLiveUpdating(true));
+		socket.addEventListener("close", () => setIsLiveUpdating(false));
+		socket.addEventListener("error", error => {
+			console.error("🪚 error", error);
+			setIsLiveUpdating(false);
+		});
+
+		socket.addEventListener("message", event => {
+			const data = JSON.parse(event.data);
+			console.log("🪚 data:", data);
+		});
+
+		return () => socket.close();
+	}, []);
 
 	const changeActiveStory = useCallback(
 		(storyId: Story["id"]) => {
@@ -95,6 +116,7 @@ export const RoomProvider = ({
 			selectedCard,
 			selectCard,
 			completeStory,
+			isLiveUpdating,
 		}),
 		[
 			room,
@@ -105,6 +127,7 @@ export const RoomProvider = ({
 			selectedCard,
 			selectCard,
 			completeStory,
+			isLiveUpdating,
 		],
 	);
 
