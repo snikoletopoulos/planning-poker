@@ -1,0 +1,5 @@
+root = "."
+
+[build]
+cmd = "go build -o ./tmp/main ./cmd/web"
+exclude_dir = ["tmp"]
