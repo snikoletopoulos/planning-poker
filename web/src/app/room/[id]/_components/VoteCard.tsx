@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/styles/utils";
 import { useRoom } from "./RoomContext";
 
-const CARD_VALUES = [1, 2, 3, 5, 8, 13, 21, "?"] as const;
+const CARD_VALUES = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?"] as const;
 
 export const VoteCard = () => {
 	const { activeStory, selectedCard, selectCard, completeStory } = useRoom();
