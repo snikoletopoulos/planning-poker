@@ -89,7 +89,12 @@ const getRoomData = async (roomId: Room["id"]) => {
 	const room = await db.query.rooms.findFirst({
 		where: (rooms, { eq }) => eq(rooms.id, roomId),
 		with: {
-			members: true,
+			members: {
+				columns: {
+					id: true,
+					name: true,
+				},
+			},
 			stories: {
 				with: { votes: true },
 			},
