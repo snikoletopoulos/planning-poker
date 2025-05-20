@@ -45,7 +45,9 @@ export const RoomProvider = ({
 }>) => {
 	const currentUser = useCurrentUser();
 
-	const [activeStory, setActiveStory] = useState(stories[0]);
+	const [activeStory, setActiveStory] = useState(
+		() => stories.find(story => !story.isCompleted) ?? stories[0],
+	);
 	const [selectedCard, setSelectedCard] = useState<number | "?" | null>(null);
 
 	const changeActiveStory = useCallback(
