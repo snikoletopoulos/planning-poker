@@ -1,15 +1,13 @@
 package main
 
 import (
-	"net/http"
+	"poker/websocket/pkg/handlers"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func registerRoutes(router *chi.Mux) *chi.Mux {
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
-	})
+	router.Get("/", handlers.WebSocketUpgrade)
 
 	return router
 }
