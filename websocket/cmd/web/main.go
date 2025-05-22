@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"poker/websocket/pkg/handlers"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
