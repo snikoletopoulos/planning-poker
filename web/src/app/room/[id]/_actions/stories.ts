@@ -23,6 +23,15 @@ export const addStory = async ({
 };
 
 export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
+	const story = await db.query.stories.findFirst({
+		where: (stories, { eq }) => eq(stories.id, storyId),
+		with: { votes: true },
+	});
+
+	if (!story) throw new Error("Story not found");
+	if (story.votes.length === 0)
+		throw new Error("A Story needs votes to be completed");
+
 	await db
 		.update(stories)
 		.set({ isCompleted: true })
