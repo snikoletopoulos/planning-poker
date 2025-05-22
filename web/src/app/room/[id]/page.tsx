@@ -1,10 +1,9 @@
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
+import { getCurrentUser } from "@/helpers/user";
 import { db } from "@/lib/db";
-import type { Room } from "@/lib/db/schema";
-import { parseToken } from "@/lib/jwt";
+import type { Room, Story, Vote } from "@/lib/db/schema";
 import type { GenerateMetadata, PageProps } from "@/types/components";
 import { Header } from "./_components/Header";
 import { Members } from "./_components/Members";
@@ -43,18 +42,10 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 		notFound();
 	}
 
-	const cookieStore = await cookies();
-	const userCookie = cookieStore.get(room.id);
-	let user;
-	try {
-		user = userCookie ? parseToken(userCookie.value) : null;
-	} catch (error) {
-		console.error("[ROOM:PARSE_TOKEN]", error);
-		cookieStore.delete(room.id);
-	}
-
+	const user = await getCurrentUser(room.id);
 	if (!user) notFound();
 
+	console.log("🪚 room:", JSON.stringify(room, null, 2));
 	return (
 		<div className="bg-background min-h-[calc(100vh-4rem)] p-4">
 			<div className="mx-auto max-w-6xl">
@@ -103,5 +94,25 @@ const getRoomData = async (roomId: Room["id"]) => {
 
 	if (!room) throw new Error("Room not found");
 
-	return room;
+	const user = await getCurrentUser(room.id);
+	if (!user) throw new Error("Unauthorized");
+
+	const stories = room.stories.reduce(
+		(acc, story) => {
+			if (story.isCompleted) return [...acc, story];
+
+			const votes = story.votes.map(vote => ({
+				...vote,
+				vote: vote.memberId === user.id ? vote.vote : null,
+			}));
+			console.log("🪚 votes:", JSON.stringify(votes, null, 2));
+			return [...acc, { ...story, votes }];
+		},
+		[] as (Story & { votes: (Vote & { vote: number | null })[] })[],
+	);
+
+	return {
+		...room,
+		stories,
+	};
 };
