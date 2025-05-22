@@ -20,5 +20,6 @@ func main() {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 
+	go handlers.ListenWsEvents()
 	http.ListenAndServe(fmt.Sprintf(":%d", PORT), registerRoutes(router))
 }
