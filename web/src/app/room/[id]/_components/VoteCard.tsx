@@ -29,14 +29,14 @@ export const VoteCard = () => {
 						Select your estimate:
 					</h3>
 
-					<div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+					<div className="flex flex-wrap justify-center gap-2">
 						{CARD_VALUES.map(value => (
 							<button
 								key={value}
 								onClick={() => selectCard(value)}
 								disabled={!!showVotes}
 								className={cn(
-									"border-border flex aspect-[2/3] items-center justify-center rounded-lg border-2 text-lg font-bold transition-all",
+									"border-border flex aspect-[2/3] h-28 items-center justify-center rounded-lg border-2 text-lg font-bold transition-all",
 									{
 										"border-primary bg-primary/10 text-primary -translate-y-1 transform shadow-md":
 											selectedCard === value,
