@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -20,6 +21,94 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wsClients = append(wsClients, ws)
-	ws.WriteJSON(struct{ Worked bool }{Worked: true})
+	// TODO: get room id
+
+	roomID := "1"
+	wsClients[roomID] = append(wsClients[roomID], ws)
+	go receiveWsEvent(ws, roomID)
+}
+
+type UserVoteBody struct {
+	UserID  string `json:"userId" validate:"required"`
+	StoryID string `json:"storyId" validate:"required"`
+}
+
+type UserVoteWsPayload struct {
+	Action  string `json:"action" validate:"required"`
+	UserID  string `json:"userId" validate:"required"`
+	StoryID string `json:"storyId" validate:"required"`
+}
+
+func UserVoted(w http.ResponseWriter, r *http.Request) {
+	var body UserVoteBody
+	err := json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid request body"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	// TODO: get room id
+	broadcastEvent("1", UserVoteWsPayload{
+		Action:  "user_voted",
+		UserID:  body.UserID,
+		StoryID: body.StoryID,
+	})
+}
+
+type NewStoryBody struct {
+	ID          string  `json:"id" validate:"required"`
+	Title       string  `json:"title" validate:"required"`
+	Description *string `json:"description" validate:"required"`
+	IsCompleted *bool   `json:"isCompleted" validate:"required"`
+	RoomID      string  `json:"roomId" validate:"required"`
+	CreatedAt   string  `json:"createdAt" validate:"required"`
+}
+
+type NewStoryWsPayload struct {
+	Action string       `json:"action" validate:"required"`
+	Story  NewStoryBody `json:"story" validate:"required"`
+}
+
+func NewStory(w http.ResponseWriter, r *http.Request) {
+	var story NewStoryBody
+	json.NewDecoder(r.Body).Decode(&story)
+	broadcastEvent(story.RoomID, NewStoryWsPayload{
+		Action: "new_story",
+		Story:  story,
+	})
+}
+
+type RevealStoryBody struct {
+	StoryID string `json:"storyId" validate:"required"`
+}
+
+func RevealStory(w http.ResponseWriter, r *http.Request) {
+	var body RevealStoryBody
+	json.NewDecoder(r.Body).Decode(&body)
+	// TODO: fetch votes
+}
+
+type Member struct {
+	ID   string `json:"id" validate:"required"`
+	Name string `json:"name" validate:"required"`
+}
+
+type MemberBody struct {
+	RoomID string `json:"roomId" validate:"required"`
+	User   Member `json:"user" validate:"required"`
+}
+
+type MemberWsPayload struct {
+	Action string `json:"action" validate:"required"`
+	Member Member `json:"member" validate:"required"`
+}
+
+func MemberJoined(w http.ResponseWriter, r *http.Request) {
+	var body MemberBody
+	json.NewDecoder(r.Body).Decode(&body)
+	broadcastEvent(body.RoomID, MemberWsPayload{
+		Action: "member_joined",
+		Member: body.User,
+	})
 }
