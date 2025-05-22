@@ -10,7 +10,8 @@ import { useRoom } from "./RoomContext";
 const CARD_VALUES = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?"] as const;
 
 export const VoteCard = () => {
-	const { activeStory, selectedCard, selectCard, completeStory } = useRoom();
+	const { activeStory, selectedCard, selectCard, completeStory, nextStory } =
+		useRoom();
 	const showVotes = activeStory.isCompleted;
 
 	return (
@@ -66,7 +67,11 @@ export const VoteCard = () => {
 						)}
 					</Button>
 
-					<Button variant="outline">
+					<Button
+						variant="outline"
+						onClick={nextStory}
+						disabled={!activeStory.isCompleted}
+					>
 						Next story
 						<ArrowRightIcon className="ml-2 h-5 w-5" />
 					</Button>
