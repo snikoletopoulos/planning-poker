@@ -2,7 +2,9 @@ import { z } from "zod";
 
 const EnvSchema = z.object({
 	DB_FILE_NAME: z.string().min(1),
-	NEXT_PUBLIC_WS_URL: z.string().url(),
+	NEXT_PUBLIC_WS_URI: z.string().min(1),
+	NEXT_PUBLIC_WS_PROTOCOL: z.string().min(1),
+	NEXT_PUBLIC_HTTP_PROTOCOL: z.string().min(1),
 });
 
 try {

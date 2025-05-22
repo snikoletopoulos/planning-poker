@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { members, type Room } from "@/lib/db/schema";
 import { createToken, parseToken } from "@/lib/jwt";
+import { Updater } from "@/services/live-update";
 import type { Transaction } from "@/types/db";
 
 export const getCurrentUser = async (roomId: Room["id"]) => {
@@ -35,6 +36,8 @@ export const createNewUser = async (
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 	});
+
+	await Updater.membersJoined({ id: user.id, name: user.name }, roomId);
 
 	return user;
 };

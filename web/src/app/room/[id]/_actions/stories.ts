@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { getCurrentUser } from "@/helpers/user";
 import { db } from "@/lib/db";
 import { stories, votes, type Room, type Story } from "@/lib/db/schema";
+import { Updater } from "@/services/live-update";
 import type { AddStoryData } from "../_components/StoriesSidebar";
 
 export const addStory = async ({
@@ -12,14 +13,19 @@ export const addStory = async ({
 	title,
 	description,
 }: AddStoryData & { roomId: Room["id"] }) => {
-	await db.insert(stories).values({
-		roomId,
-		title,
-		description,
-		isCompleted: false,
-	});
+	const result = await db
+		.insert(stories)
+		.values({
+			roomId,
+			title,
+			description,
+			isCompleted: false,
+		})
+		.returning();
 
-	// TODO: Send story to websocket
+	if (!result[0]) throw new Error("Story not found");
+
+	await Updater.newStory(result[0]);
 };
 
 export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
@@ -37,7 +43,7 @@ export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
 		.set({ isCompleted: true })
 		.where(eq(stories.id, storyId));
 
-	// TODO: Send completeness to websocket
+	await Updater.completeStory(storyId);
 };
 
 export const voteForStory = async ({
@@ -76,5 +82,5 @@ export const voteForStory = async ({
 		});
 	}
 
-	// TODO: Send vote to websocket
+	await Updater.userVoted(user.id, story.id);
 };
