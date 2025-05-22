@@ -91,6 +91,7 @@ const AddStory = () => {
 		handleSubmit,
 		formState: { isValid, isSubmitting, errors },
 		setError,
+		reset,
 	} = useForm({
 		resolver: zodResolver(AddStorySchema),
 	});
@@ -98,6 +99,7 @@ const AddStory = () => {
 	const handleAddStory = handleSubmit(async data => {
 		try {
 			await addStory({ ...data, roomId: room.id });
+			reset();
 		} catch (error) {
 			console.error("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
