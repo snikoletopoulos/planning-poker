@@ -47,7 +47,7 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 
 	console.log("🪚 room:", JSON.stringify(room, null, 2));
 	return (
-		<div className="bg-background min-h-[calc(100vh-4rem)] p-4">
+		<div className="bg-background container mx-auto mt-4 min-h-[calc(100vh-4rem)]">
 			<div className="mx-auto max-w-6xl">
 				<CurrentUserProvider user={user}>
 					<RoomProvider
