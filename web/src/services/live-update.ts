@@ -29,12 +29,12 @@ export class Updater {
 	}
 
 	static async membersJoined(
-		user: Pick<Member, "id" | "name">,
+		member: Pick<Member, "id" | "name">,
 		roomId: Room["id"],
 	) {
 		await fetch(`${this.url}/join`, {
 			method: "POST",
-			body: JSON.stringify({ user, roomId }),
+			body: JSON.stringify({ member, roomId }),
 		});
 	}
 }
