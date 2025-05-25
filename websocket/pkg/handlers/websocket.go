@@ -8,18 +8,23 @@ import (
 )
 
 var (
-	wsClients = make(map[string][]*websocket.Conn)
+	wsClients = make(map[string][]*WsConnection)
 	wsChan    = make(chan WsPayload)
 )
 
-type WsPayload struct {
-	Action string
-	Data   any
+type WsConnection struct {
 	Conn   *websocket.Conn
 	RoomID string
+	UserID string
 }
 
-func receiveWsEvent(ws *websocket.Conn, roomID string) {
+type WsPayload struct {
+	Client WsConnection
+	Action string
+	Data   any
+}
+
+func receiveWsEvent(client WsConnection) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Error", r)
@@ -28,14 +33,12 @@ func receiveWsEvent(ws *websocket.Conn, roomID string) {
 
 	for {
 		var message any
-		if err := ws.ReadJSON(&message); err != nil {
+		if err := client.Conn.ReadJSON(&message); err != nil {
 			log.Println("Error reading from websocket:", err)
-			ws.Close()
-			deleteWsClient(roomID, ws)
+			client.Conn.Close()
+			deleteWsClient(&client)
 			return
 		}
-
-		wsChan <- WsPayload{Action: "next_story", Data: nil, Conn: ws, RoomID: roomID}
 	}
 }
 
@@ -49,34 +52,35 @@ func ListenWsEvents() {
 			type NextStoryData struct {
 				Action string `json:"action"`
 			}
-			broadcastEvent(event.RoomID, NextStoryData{Action: "next_story"})
-
+			broadcastEvent(event.Client.RoomID, NextStoryData{Action: "next_story"})
 		case "leave":
-			deleteWsClient(event.RoomID, event.Conn)
+			deleteWsClient(&event.Client)
 		}
 	}
 }
 
 func broadcastEvent(roomID string, data any) {
-	var clientsToRemove []*websocket.Conn
-	for _, ws := range wsClients[roomID] {
-		if err := ws.WriteJSON(data); err != nil {
+	var clientsToRemove []*WsConnection
+	for _, client := range wsClients[roomID] {
+		if err := client.Conn.WriteJSON(data); err != nil {
 			log.Println("Error writing to websocket:", err)
-			ws.Close()
-			clientsToRemove = append(clientsToRemove, ws)
+			client.Conn.Close()
+			clientsToRemove = append(clientsToRemove, client)
 		}
 	}
 
-	for _, ws := range clientsToRemove {
-		deleteWsClient(roomID, ws)
+	for _, client := range clientsToRemove {
+		deleteWsClient(client)
 	}
 }
 
-func deleteWsClient(roomID string, ws *websocket.Conn) {
+func deleteWsClient(client *WsConnection) {
+	roomID := client.RoomID
+
 	var index int
 	itemFound := false
-	for i, client := range wsClients[roomID] {
-		if client == ws {
+	for i, conn := range wsClients[roomID] {
+		if client == conn {
 			index = i
 			itemFound = true
 			break
