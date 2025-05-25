@@ -45,7 +45,6 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 	const user = await getCurrentUser(room.id);
 	if (!user) notFound();
 
-	console.log("🪚 room:", JSON.stringify(room, null, 2));
 	return (
 		<div className="bg-background container mx-auto mt-4 min-h-[calc(100vh-4rem)]">
 			<div className="mx-auto max-w-6xl">
@@ -105,7 +104,6 @@ const getRoomData = async (roomId: Room["id"]) => {
 				...vote,
 				vote: vote.memberId === user.id ? vote.vote : null,
 			}));
-			console.log("🪚 votes:", JSON.stringify(votes, null, 2));
 			return [...acc, { ...story, votes }];
 		},
 		[] as (Story & { votes: (Vote & { vote: number | null })[] })[],
