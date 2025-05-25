@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"poker/websocket/pkg/auth"
 	"github.com/gorilla/websocket"
 )
 
@@ -21,17 +22,19 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: get room id
-
-	roomID := "1"
-	userID := "1"
+	user, ok := r.Context().Value("user").(auth.AuthToken)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching user"))
+		return
+	}
 
 	client := WsConnection{
 		Conn:   ws,
-		RoomID: roomID,
-		UserID: userID,
+		RoomID: user.RoomID,
+		UserID: user.ID,
 	}
-	wsClients[roomID] = append(wsClients[roomID], &client)
+	wsClients[user.RoomID] = append(wsClients[user.RoomID], &client)
 	go receiveWsEvent(client)
 }
 
