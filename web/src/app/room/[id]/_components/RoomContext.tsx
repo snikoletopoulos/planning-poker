@@ -124,6 +124,11 @@ export const RoomProvider = ({
 		socket.addEventListener("message", event => {
 			const WsEventSchema = z.discriminatedUnion("action", [
 				z.object({
+					action: z.literal("self_voted"),
+					storyId: z.string(),
+					vote: z.union([z.number(), z.null()]),
+				}),
+				z.object({
 					action: z.literal("user_voted"),
 					storyId: z.string(),
 					memberId: z.string(),
@@ -150,9 +155,35 @@ export const RoomProvider = ({
 			]);
 
 			const data = WsEventSchema.parse(JSON.parse(event.data as string));
+			console.log("🪚 data:", data);
 
 			switch (data.action) {
+				case "self_voted": {
+					setStories(stories => {
+						const story = stories.find(story => story.id === data.storyId);
+						if (!story) return stories;
+						const exitingVoteIndex = story.votes.findIndex(
+							vote => vote.memberId === currentUser.id,
+						);
+
+						if (exitingVoteIndex === -1) {
+							story.votes.push({
+								vote: data.vote,
+								storyId: data.storyId,
+								memberId: currentUser.id,
+								createdAt: new Date(),
+							});
+						} else {
+							story.votes[exitingVoteIndex].vote = data.vote;
+						}
+
+						return [...stories];
+					});
+					setSelectedCard(data.vote ?? "?");
+					break;
+				}
 				case "user_voted": {
+					if (data.memberId === currentUser.id) return;
 					setStories(stories => {
 						const story = stories.find(story => story.id === data.storyId);
 						if (!story) return stories;

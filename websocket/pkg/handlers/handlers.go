@@ -41,6 +41,14 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 type UserVoteBody struct {
 	MemberID string `json:"memberId" validate:"required"`
 	StoryID  string `json:"storyId" validate:"required"`
+	Vote     *int   `json:"vote" validate:"required"`
+}
+
+type SelfVoteWsPayload struct {
+	Action   string `json:"action" validate:"required"`
+	MemberID string `json:"memberId" validate:"required"`
+	StoryID  string `json:"storyId" validate:"required"`
+	Vote     *int   `json:"vote" validate:"required"`
 }
 
 type MemberVoteWsPayload struct {
@@ -64,6 +72,18 @@ func UserVoted(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Error fetching user"))
 		return
+	}
+
+	roomClients := wsClients[user.RoomID]
+	for _, client := range roomClients {
+		if client.UserID == user.ID {
+			client.Conn.WriteJSON(SelfVoteWsPayload{
+				Action:   "self_voted",
+				MemberID: body.MemberID,
+				StoryID:  body.StoryID,
+				Vote:     body.Vote,
+			})
+		}
 	}
 
 	broadcastEvent(user.RoomID, MemberVoteWsPayload{

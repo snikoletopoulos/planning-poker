@@ -82,5 +82,5 @@ export const voteForStory = async ({
 		});
 	}
 
-	await Updater.userVoted(user.id, story.id);
+	await Updater.userVoted(user.id, story.id, vote);
 };

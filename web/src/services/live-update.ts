@@ -3,10 +3,14 @@ import type { Member, Room, Story } from "@/lib/db/schema";
 export class Updater {
 	static url = `${process.env.NEXT_PUBLIC_HTTP_PROTOCOL}://${process.env.NEXT_PUBLIC_WS_URI}`;
 
-	static async userVoted(userId: Member["id"], storyId: Story["id"]) {
+	static async userVoted(
+		memberId: Member["id"],
+		storyId: Story["id"],
+		vote: number | null,
+	) {
 		await fetch(`${this.url}/vote`, {
 			method: "POST",
-			body: JSON.stringify({ userId, storyId }),
+			body: JSON.stringify({ memberId, storyId, vote }),
 		});
 	}
 
