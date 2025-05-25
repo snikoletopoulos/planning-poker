@@ -39,14 +39,14 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 }
 
 type UserVoteBody struct {
-	UserID  string `json:"userId" validate:"required"`
-	StoryID string `json:"storyId" validate:"required"`
+	MemberID string `json:"memberId" validate:"required"`
+	StoryID  string `json:"storyId" validate:"required"`
 }
 
-type UserVoteWsPayload struct {
-	Action  string `json:"action" validate:"required"`
-	UserID  string `json:"userId" validate:"required"`
-	StoryID string `json:"storyId" validate:"required"`
+type MemberVoteWsPayload struct {
+	Action   string `json:"action" validate:"required"`
+	MemberID string `json:"memberId" validate:"required"`
+	StoryID  string `json:"storyId" validate:"required"`
 }
 
 func UserVoted(w http.ResponseWriter, r *http.Request) {
@@ -58,11 +58,18 @@ func UserVoted(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	// TODO: get room id
-	broadcastEvent("1", UserVoteWsPayload{
-		Action:  "user_voted",
-		UserID:  body.UserID,
-		StoryID: body.StoryID,
+
+	user, ok := r.Context().Value("user").(auth.AuthToken)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching user"))
+		return
+	}
+
+	broadcastEvent(user.RoomID, MemberVoteWsPayload{
+		Action:   "user_voted",
+		MemberID: body.MemberID,
+		StoryID:  body.StoryID,
 	})
 }
 
@@ -106,7 +113,7 @@ type Member struct {
 
 type MemberBody struct {
 	RoomID string `json:"roomId" validate:"required"`
-	User   Member `json:"user" validate:"required"`
+	Member Member `json:"member" validate:"required"`
 }
 
 type MemberWsPayload struct {
@@ -119,6 +126,6 @@ func MemberJoined(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&body)
 	broadcastEvent(body.RoomID, MemberWsPayload{
 		Action: "member_joined",
-		Member: body.User,
+		Member: body.Member,
 	})
 }
