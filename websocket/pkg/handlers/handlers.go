@@ -24,8 +24,15 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 	// TODO: get room id
 
 	roomID := "1"
-	wsClients[roomID] = append(wsClients[roomID], ws)
-	go receiveWsEvent(ws, roomID)
+	userID := "1"
+
+	client := WsConnection{
+		Conn:   ws,
+		RoomID: roomID,
+		UserID: userID,
+	}
+	wsClients[roomID] = append(wsClients[roomID], &client)
+	go receiveWsEvent(client)
 }
 
 type UserVoteBody struct {
