@@ -126,7 +126,7 @@ export const RoomProvider = ({
 				z.object({
 					action: z.literal("self_voted"),
 					storyId: z.string(),
-					vote: z.union([z.number(), z.null()]),
+					vote: z.number().nullable(),
 				}),
 				z.object({
 					action: z.literal("user_voted"),
@@ -235,7 +235,7 @@ export const RoomProvider = ({
 			socket.send(JSON.stringify({ action: "leave" }));
 			socket.close();
 		};
-	}, []);
+	}, [currentUser.id]);
 
 	const value = useMemo(
 		() => ({
