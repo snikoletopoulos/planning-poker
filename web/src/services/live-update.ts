@@ -14,7 +14,7 @@ export class Updater {
 		});
 	}
 
-	static async newStory(story: Story) {
+	static async addStory(story: Story) {
 		await fetch(`${this.url}/story`, {
 			method: "POST",
 			body: JSON.stringify(story),

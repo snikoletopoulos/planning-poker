@@ -25,7 +25,7 @@ export const addStory = async ({
 
 	if (!result[0]) throw new Error("Story not found");
 
-	await Updater.newStory(result[0]);
+	await Updater.addStory(result[0]);
 };
 
 export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
