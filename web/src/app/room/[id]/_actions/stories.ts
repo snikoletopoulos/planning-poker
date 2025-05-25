@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/helpers/user";
 import { db } from "@/lib/db";
@@ -25,7 +26,12 @@ export const addStory = async ({
 
 	if (!result[0]) throw new Error("Story not found");
 
-	await Updater.addStory(result[0]);
+	try {
+		await Updater.addStory(result[0]);
+	} catch (error) {
+		console.error("Error updating live data: (newStory)", error);
+		revalidatePath(`/room/${roomId}`);
+	}
 };
 
 export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
@@ -43,7 +49,12 @@ export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
 		.set({ isCompleted: true })
 		.where(eq(stories.id, storyId));
 
-	await Updater.completeStory(storyId);
+	try {
+		await Updater.completeStory(storyId);
+	} catch (error) {
+		console.error("Error updating live data: (completeStory)", error);
+		revalidatePath(`/room/${story.roomId}`);
+	}
 };
 
 export const voteForStory = async ({
@@ -82,5 +93,10 @@ export const voteForStory = async ({
 		});
 	}
 
-	await Updater.userVoted(user.id, story.id, vote);
+	try {
+		await Updater.userVoted(user.id, story.id, vote);
+	} catch (error) {
+		console.error("Error updating live data: (userVoted)", error);
+		revalidatePath(`/room/${story.roomId}`);
+	}
 };
