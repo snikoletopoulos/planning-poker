@@ -1,5 +1,6 @@
 "use client";
 
+import { startTransition, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -17,6 +18,7 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
 import type { Room } from "@/lib/db/schema";
+import { PasteFromClipboardButton } from "./PasteFromClipboardButton";
 
 const CreateRoomSchema = z.object({
 	roomName: z.string().min(1, "Room name is required"),
@@ -51,6 +53,7 @@ export const CreateRoomForm = ({
 	) => Promise<Room["id"]>;
 }) => {
 	const router = useRouter();
+	const [isPending, startTransition] = useTransition();
 
 	const {
 		formState: { isValid, isSubmitting, errors },
@@ -120,14 +123,25 @@ export const CreateRoomForm = ({
 							<p className="text-sm text-red-500">{errors.stories.message}</p>
 						)}
 
-						<Button
-							variant="outline"
-							onClick={() => append({ title: "", description: "" })}
-							className="w-full"
-						>
-							<Plus className="mr-2 h-4 w-4" />
-							Add Another Story
-						</Button>
+						<div className="flex items-center justify-between gap-4">
+							<PasteFromClipboardButton
+								loading={isPending}
+								addStory={title => {
+									startTransition(() => {
+										append({ title, description: "" });
+									});
+								}}
+							/>
+
+							<Button
+								variant="secondary"
+								onClick={() => append({ title: "", description: "" })}
+								className="w-full"
+							>
+								<Plus />
+								Add Another Story
+							</Button>
+						</div>
 					</div>
 				</div>
 			</CardContent>
