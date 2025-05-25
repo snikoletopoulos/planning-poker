@@ -12,6 +12,7 @@ func registerMiddlewares(router *chi.Mux) {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
+	router.Use(authMiddleware)
 }
 
 func registerRoutes(router *chi.Mux) {
