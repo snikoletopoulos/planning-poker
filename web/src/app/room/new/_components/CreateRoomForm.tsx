@@ -41,7 +41,7 @@ const { formControl, register, handleSubmit, control, setError } =
 		defaultValues: {
 			roomName: "",
 			name: "",
-			stories: [{ title: "", description: "" }],
+			stories: [],
 		},
 	});
 
