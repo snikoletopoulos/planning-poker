@@ -9,7 +9,7 @@ import { stories, votes, type Room, type Story } from "@/lib/db/schema";
 import { Updater } from "@/services/live-update";
 import type { AddStoryData } from "../_components/StoriesSidebar";
 
-export const addStory = async ({
+export const addStoryAction = async ({
 	roomId,
 	title,
 	description,
@@ -34,7 +34,11 @@ export const addStory = async ({
 	}
 };
 
-export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
+export const completeStoryAction = async ({
+	storyId,
+}: {
+	storyId: Story["id"];
+}) => {
 	const story = await db.query.stories.findFirst({
 		where: (stories, { eq }) => eq(stories.id, storyId),
 		with: { votes: true },
@@ -57,7 +61,7 @@ export const completeStory = async ({ storyId }: { storyId: Story["id"] }) => {
 	}
 };
 
-export const voteForStory = async ({
+export const voteForStoryAction = async ({
 	storyId,
 	vote,
 }: {

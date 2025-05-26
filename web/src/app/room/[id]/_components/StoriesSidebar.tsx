@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { cn } from "@/lib/styles/utils";
-import { addStory } from "../_actions/stories";
+import { addStoryAction } from "../_actions/stories";
 import { useRoom } from "./RoomContext";
 
 export const StoriesSidebar = () => (
@@ -98,7 +98,7 @@ const AddStory = () => {
 
 	const handleAddStory = handleSubmit(async data => {
 		try {
-			await addStory({ ...data, roomId: room.id });
+			await addStoryAction({ ...data, roomId: room.id });
 			reset();
 		} catch (error) {
 			console.error("[CREATE_ROOM:SUBMIT]", error);
