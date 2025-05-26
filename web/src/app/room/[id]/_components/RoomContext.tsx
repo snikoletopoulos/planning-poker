@@ -14,13 +14,10 @@ import { z } from "zod";
 
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import type { Member, Room, Story, Vote } from "@/lib/db/schema";
-import {
-	completeStory as completeStoryAction,
-	voteForStory,
-} from "../_actions/stories";
+import { completeStoryAction, voteForStoryAction } from "../_actions/stories";
 
 interface StoryWithVotes extends Story {
-	votes: (Omit<Vote, "vote"> & { vote: number | null })[];
+	votes: Vote[];
 }
 
 interface RoomContextData {
@@ -88,7 +85,7 @@ export const RoomProvider = ({
 	const selectCard = useCallback(
 		async (card: number | "?" | null) => {
 			setSelectedCard(card);
-			await voteForStory({
+			await voteForStoryAction({
 				storyId: activeStory.id,
 				vote: card === "?" ? null : card,
 			});
