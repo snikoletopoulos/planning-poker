@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 
-import { createNewUser } from "@/helpers/user";
-import { db } from "@/lib/db";
-import {
-	type JoinRoomFormData,
-} from "./_components/JoinRoomForm";
+import { JoinRoomForm } from "@/components/JoinRoomForm";
 import { joinRoomAction } from "./_actions/JoinRoom";
 
 export const metadata: Metadata = {

@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 
+import { joinRoomAction } from "@/app/_actions/JoinRoom";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
+import { JoinRoomForm } from "@/components/JoinRoomForm";
 import { getCurrentUser } from "@/helpers/user";
 import { db } from "@/lib/db";
-import type { Room, Story, Vote } from "@/lib/db/schema";
+import type { Member, Room, Story, Vote } from "@/lib/db/schema";
 import type { GenerateMetadata, PageProps } from "@/types/components";
 import { Header } from "./_components/Header";
 import { Members } from "./_components/Members";
@@ -20,16 +22,12 @@ export const generateMetadata: GenerateMetadata<Params> = async ({
 }) => {
 	const roomId = (await params).id;
 
-	let room;
 	try {
-		room = await getRoomData(roomId);
+		const room = await getRoomData(roomId);
+		return { title: room.name };
 	} catch {
 		notFound();
 	}
-
-	return {
-		title: room.name,
-	};
 };
 
 const RoomPage = async ({ params }: PageProps<Params>) => {
@@ -42,13 +40,52 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 		notFound();
 	}
 
-	const user = await getCurrentUser(room.id);
-	if (!user) notFound();
+	const currentUser = await getCurrentUser(roomId);
+	if (!currentUser) {
+		return (
+			<div className="bg-background flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4">
+				<main className="w-full max-w-md space-y-8">
+					<header className="text-center">
+						<h1 className="text-foreground text-4xl font-bold tracking-tight">
+							Planning Poker
+						</h1>
+
+						<p className="text-muted-foreground mt-3">
+							Estimate your tasks collaboratively with your team
+						</p>
+					</header>
+
+					<JoinRoomForm
+						roomName={room.name}
+						roomCode={room.id}
+						onSubmitAction={joinRoomAction}
+					/>
+
+					<div className="text-muted-foreground text-center text-sm">
+						<p>
+							Plan better, estimate faster, and build consensus with your team
+						</p>
+					</div>
+				</main>
+			</div>
+		);
+	}
+
+	const stories = room.stories.reduce(
+		(acc, story) => {
+			if (story.isCompleted) return [...acc, story];
+			const hiddenVotes = hideVotes(story.votes, currentUser.id);
+			return [...acc, { ...story, votes: hiddenVotes }];
+		},
+		[] as (Story & { votes: (Vote & { vote: number | null })[] })[],
+	);
+
+	room.stories = stories;
 
 	return (
 		<div className="bg-background container mx-auto mt-4 min-h-[calc(100vh-4rem)]">
 			<div className="mx-auto max-w-6xl">
-				<CurrentUserProvider user={user}>
+				<CurrentUserProvider user={currentUser}>
 					<RoomProvider
 						room={room}
 						stories={room.stories}
@@ -90,27 +127,13 @@ const getRoomData = async (roomId: Room["id"]) => {
 			},
 		},
 	});
-
 	if (!room) throw new Error("Room not found");
 
-	const user = await getCurrentUser(room.id);
-	if (!user) throw new Error("Unauthorized");
-
-	const stories = room.stories.reduce(
-		(acc, story) => {
-			if (story.isCompleted) return [...acc, story];
-
-			const votes = story.votes.map(vote => ({
-				...vote,
-				vote: vote.memberId === user.id ? vote.vote : null,
-			}));
-			return [...acc, { ...story, votes }];
-		},
-		[] as (Story & { votes: (Vote & { vote: number | null })[] })[],
-	);
-
-	return {
-		...room,
-		stories,
-	};
+	return room;
 };
+
+const hideVotes = (votes: Vote[], userId: Member["id"]) =>
+	votes.map(vote => ({
+		...vote,
+		vote: vote.memberId === userId ? vote.vote : null,
+	}));

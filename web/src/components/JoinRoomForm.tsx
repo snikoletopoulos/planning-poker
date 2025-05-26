@@ -22,8 +22,12 @@ import type { Room } from "@/lib/db/schema";
 
 export const JoinRoomForm = ({
 	onSubmitAction,
+	roomName,
+	roomCode,
 }: {
 	onSubmitAction: (data: z.infer<typeof JoinRoomSchema>) => Promise<Room["id"]>;
+	roomName?: string;
+	roomCode?: Room["id"];
 }) => {
 	const router = useRouter();
 
@@ -34,6 +38,10 @@ export const JoinRoomForm = ({
 		setError,
 	} = useForm({
 		resolver: zodResolver(JoinRoomSchema),
+		defaultValues: {
+			name: "",
+			roomCode: roomCode ?? "",
+		},
 	});
 
 	const handleJoinRoom = handleSubmit(async data => {
@@ -49,7 +57,7 @@ export const JoinRoomForm = ({
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Join a Session</CardTitle>
+				<CardTitle>Join {roomName ?? "a Room"}</CardTitle>
 
 				<CardDescription>
 					Enter a room code or create a new room
@@ -62,6 +70,7 @@ export const JoinRoomForm = ({
 					<Input
 						id="room-code"
 						{...register("roomCode")}
+						disabled={!!roomCode}
 						placeholder="Enter room code"
 					/>
 					{errors.roomCode && (
@@ -83,14 +92,20 @@ export const JoinRoomForm = ({
 			</CardContent>
 
 			<CardFooter className="flex justify-between">
-				<Button variant="outline" asChild>
-					<Link href="/room/new">
-						Create Room
-						<ArrowRight className="ml-2 h-4 w-4" />
-					</Link>
-				</Button>
+				{!roomCode && (
+					<Button variant="outline" asChild>
+						<Link href="/room/new">
+							Create Room
+							<ArrowRight className="ml-2 h-4 w-4" />
+						</Link>
+					</Button>
+				)}
 
-				<Button onClick={handleJoinRoom} disabled={!isValid || isSubmitting}>
+				<Button
+					className="ml-auto"
+					onClick={handleJoinRoom}
+					disabled={!isValid || isSubmitting}
+				>
 					Join Room
 					<Users className="ml-2 h-4 w-4" />
 				</Button>
