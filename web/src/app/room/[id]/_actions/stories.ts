@@ -3,10 +3,10 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/helpers/user";
+import { getCurrentUser, getUserToken } from "@/helpers/user";
 import { db } from "@/lib/db";
 import { stories, votes, type Room, type Story } from "@/lib/db/schema";
-import { Updater } from "@/services/live-update";
+import { updateClients } from "@/services/live-update";
 import type { AddStoryData } from "../_components/StoriesSidebar";
 
 export const addStoryAction = async ({
@@ -27,7 +27,11 @@ export const addStoryAction = async ({
 	if (!result[0]) throw new Error("Story not found");
 
 	try {
-		await Updater.addStory(result[0]);
+		const token = await getUserToken(roomId);
+		if (!token) throw new Error("Unauthorized");
+		await updateClients(token, "addStory", {
+			story: result[0],
+		});
 	} catch (error) {
 		console.error("Error updating live data: (newStory)", error);
 		revalidatePath(`/room/${roomId}`);
@@ -54,7 +58,9 @@ export const completeStoryAction = async ({
 		.where(eq(stories.id, storyId));
 
 	try {
-		await Updater.completeStory(storyId);
+		const token = await getUserToken(story.roomId);
+		if (!token) throw new Error("Unauthorized");
+		await updateClients(token, "completeStory", { storyId });
 	} catch (error) {
 		console.error("Error updating live data: (completeStory)", error);
 		revalidatePath(`/room/${story.roomId}`);
@@ -75,10 +81,12 @@ export const voteForStoryAction = async ({
 
 	if (!story) throw new Error("Story not found");
 	if (story.isCompleted) throw new Error("Story is already completed");
-	const user = await getCurrentUser(story.roomId);
-	if (!user) throw new Error("Unauthorized");
+	const currentUser = await getCurrentUser(story.roomId);
+	if (!currentUser) throw new Error("Unauthorized");
 
-	const existingVote = story.votes.find(vote => vote.memberId === user.id);
+	const existingVote = story.votes.find(
+		vote => vote.memberId === currentUser.id,
+	);
 	if (existingVote) {
 		await db
 			.update(votes)
@@ -91,14 +99,20 @@ export const voteForStoryAction = async ({
 			);
 	} else {
 		await db.insert(votes).values({
-			memberId: user.id,
+			memberId: currentUser.id,
 			storyId,
 			vote: typeof vote === "number" ? vote : null,
 		});
 	}
 
 	try {
-		await Updater.userVoted(user.id, story.id, vote);
+		const token = await getUserToken(story.roomId);
+		if (!token) throw new Error("Unauthorized");
+		await updateClients(token, "userVoted", {
+			memberId: currentUser.id,
+			storyId,
+			vote,
+		});
 	} catch (error) {
 		console.error("Error updating live data: (userVoted)", error);
 		revalidatePath(`/room/${story.roomId}`);
