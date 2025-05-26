@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -14,22 +15,26 @@ import { cn } from "@/lib/styles/utils";
 import { addStoryAction } from "../_actions/stories";
 import { useRoom } from "./RoomContext";
 
-export const StoriesSidebar = () => (
-	<Tabs defaultValue="stories">
-		<TabsList className="grid w-full grid-cols-2">
-			<TabsTrigger value="stories">Stories</TabsTrigger>
-			<TabsTrigger value="add">Add Story</TabsTrigger>
-		</TabsList>
+export const StoriesSidebar = () => {
+	const [activeTab, setActiveTab] = useState("stories");
 
-		<TabsContent value="stories" className="mt-4">
-			<StoryList />
-		</TabsContent>
+	return (
+		<Tabs defaultValue="stories" value={activeTab} onValueChange={setActiveTab}>
+			<TabsList className="grid w-full grid-cols-2">
+				<TabsTrigger value="stories">Stories</TabsTrigger>
+				<TabsTrigger value="add">Add Story</TabsTrigger>
+			</TabsList>
 
-		<TabsContent value="add" className="mt-4">
-			<AddStory />
-		</TabsContent>
-	</Tabs>
-);
+			<TabsContent value="stories" className="mt-4">
+				<StoryList />
+			</TabsContent>
+
+			<TabsContent value="add" className="mt-4">
+				<AddStory onComplete={() => setActiveTab("stories")} />
+			</TabsContent>
+		</Tabs>
+	);
+};
 
 const StoryList = () => {
 	const { stories, activeStory, changeActiveStory } = useRoom();
@@ -83,7 +88,7 @@ const StoryList = () => {
 	);
 };
 
-const AddStory = () => {
+const AddStory = ({ onComplete }: { onComplete: () => void }) => {
 	const { room } = useRoom();
 
 	const {
@@ -100,6 +105,7 @@ const AddStory = () => {
 		try {
 			await addStoryAction({ ...data, roomId: room.id });
 			reset();
+			onComplete();
 		} catch (error) {
 			console.error("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
