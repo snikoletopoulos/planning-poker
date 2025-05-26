@@ -1,11 +1,9 @@
 import { createId } from "@paralleldrive/cuid2";
-import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { db } from "@/lib/db";
 import { members, type Room } from "@/lib/db/schema";
 import { createToken, parseToken } from "@/lib/jwt";
-import { updateClients } from "@/services/live-update";
 import type { Transaction } from "@/types/db";
 
 export const getUserToken = async (roomId: Room["id"]) => {
@@ -19,7 +17,6 @@ export const getCurrentUser = async (roomId: Room["id"]) => {
 	return parseToken(token);
 };
 
-// TODO
 export const createNewUser = async (
 	name: string,
 	roomId: Room["id"],
@@ -43,12 +40,5 @@ export const createNewUser = async (
 		secure: process.env.NODE_ENV === "production",
 	});
 
-	try {
-		await updateClients(newToken, "membersJoined", { roomId, member: user });
-	} catch (error) {
-		console.error("Error updating live data: (createNewUser)", error);
-		revalidatePath(`/room/${roomId}`);
-	}
-
-	return user;
+	return { user, token: newToken };
 };

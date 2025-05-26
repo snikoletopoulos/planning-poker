@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
@@ -12,6 +13,7 @@ import {
 import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";
 import { rooms, stories as storiesTable, type NewStory } from "@/lib/db/schema";
+import { updateClients } from "@/services/live-update";
 import {
 	CreateRoomForm,
 	type CreateRoomFormData,
@@ -29,7 +31,7 @@ const NewRoomPage = () => {
 	}: CreateRoomFormData) => {
 		"use server";
 
-		return await db.transaction(async tx => {
+		const { room, token, user } = await db.transaction(async tx => {
 			const roomsResult = await tx
 				.insert(rooms)
 				.values({
@@ -41,7 +43,7 @@ const NewRoomPage = () => {
 
 			if (!roomsResult[0]) tx.rollback();
 
-			await createNewUser(name, roomsResult[0].id, tx);
+			const { user, token } = await createNewUser(name, roomsResult[0].id, tx);
 
 			const storiesData = stories.map(
 				({ title, description }) =>
@@ -54,8 +56,20 @@ const NewRoomPage = () => {
 
 			await tx.insert(storiesTable).values(storiesData);
 
-			return roomsResult[0].id;
+			return { room: roomsResult[0], user, token };
 		});
+
+		try {
+			await updateClients(token, "membersJoined", {
+				roomId: room.id,
+				member: user,
+			});
+		} catch (error) {
+			console.error("Error updating live data: (createNewUser)", error);
+			revalidatePath(`/room/${room.id}`);
+		}
+
+		return room.id;
 	};
 
 	return (

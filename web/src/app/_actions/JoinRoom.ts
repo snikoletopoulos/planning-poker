@@ -1,10 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import type { JoinRoomFormData } from "@/components/JoinRoomForm";
 import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";
+import { updateClients } from "@/services/live-update";
 
 export const joinRoomAction = async ({ name, roomCode }: JoinRoomFormData) => {
 	const room = await db.query.rooms.findFirst({
@@ -21,7 +23,17 @@ export const joinRoomAction = async ({ name, roomCode }: JoinRoomFormData) => {
 		return room.id;
 	}
 
-	await createNewUser(name, room.id);
+	const { user, token: newToken } = await createNewUser(name, room.id);
+
+	try {
+		await updateClients(newToken, "membersJoined", {
+			roomId: roomCode,
+			member: user,
+		});
+	} catch (error) {
+		console.error("Error updating live data: (createNewUser)", error);
+		revalidatePath(`/room/${roomCode}`);
+	}
 
 	return room.id;
 };
