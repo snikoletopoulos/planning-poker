@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { joinRoomAction } from "@/app/_actions/JoinRoom";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { JoinRoomForm } from "@/components/JoinRoomForm";
-import { getCurrentUser } from "@/helpers/user";
+import { getCurrentUser, getUserToken } from "@/helpers/user";
 import { db } from "@/lib/db";
 import type { Member, Room, Story, Vote } from "@/lib/db/schema";
 import type { GenerateMetadata, PageProps } from "@/types/components";
@@ -82,6 +82,9 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 
 	room.stories = stories;
 
+	const authToken = await getUserToken(roomId)
+	if (!authToken) return null;
+
 	return (
 		<div className="bg-background container mx-auto mt-4 min-h-[calc(100vh-4rem)]">
 			<div className="mx-auto max-w-6xl">
@@ -90,6 +93,7 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 						room={room}
 						stories={room.stories}
 						members={room.members}
+						authToken={authToken}
 					>
 						<Header />
 
