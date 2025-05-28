@@ -7,6 +7,7 @@ import "@/lib/verifyEnv";
 
 import { NavBar } from "@/components/NavBar";
 import { ThemeProvider } from "@/components/ThemeContext";
+import { Toaster } from "@/components/ui/Toasts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
 			<ThemeProvider>
 				<NavBar />
 				{children}
+				<Toaster />
 			</ThemeProvider>
 		</body>
 	</html>
