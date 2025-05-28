@@ -10,7 +10,6 @@ import {
 	type PropsWithChildren,
 } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { useCurrentUser } from "@/components/CurrentUserProvider";
