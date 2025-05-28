@@ -67,7 +67,7 @@ type SelfVoteWsPayload struct {
 	Action   string `json:"action" validate:"required"`
 	MemberID string `json:"memberId" validate:"required"`
 	StoryID  string `json:"storyId" validate:"required"`
-	Vote     *int   `json:"vote" validate:"required"`
+	Vote     *int    `json:"vote" validate:"required"`
 }
 
 type MemberVoteWsPayload struct {
