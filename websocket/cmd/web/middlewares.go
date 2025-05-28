@@ -10,7 +10,7 @@ import (
 
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var token string
+		var authToken auth.AuthToken
 
 		authHeader := r.Header.Get("Authorization")
 		if authHeader != "" {
@@ -20,15 +20,8 @@ func authMiddleware(next http.Handler) http.Handler {
 				w.Write([]byte("Unauthorized"))
 				return
 			}
-			token = authHeaderSplit[1]
-		}
 
-		// TODO: get token from ws handshake
-
-		authorized := false
-
-		var authToken auth.AuthToken
-		if token != "" {
+			token := authHeaderSplit[1]
 			var err error
 			authToken, err = auth.ParseToken(r.Context(), token)
 			if err != nil {
@@ -36,10 +29,20 @@ func authMiddleware(next http.Handler) http.Handler {
 				w.Write([]byte("Unauthorized"))
 				return
 			}
-			authorized = true
 		}
 
-		if !authorized {
+		tempToken := r.URL.Query().Get("token")
+		if tempToken != "" {
+			var err error
+			authToken, err = auth.TradeEphemeralToken(tempToken)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("Invalid token"))
+				return
+			}
+		}
+
+		if authToken.ID == "" {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("Unauthorized"))
 			return

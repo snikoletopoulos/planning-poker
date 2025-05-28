@@ -16,6 +16,8 @@ func registerMiddlewares(router *chi.Mux) {
 }
 
 func registerRoutes(router *chi.Mux) {
+	router.Get("/token", handlers.GetToken)
+
 	router.Get("/", handlers.WebSocketUpgrade)
 	router.Post("/vote", handlers.UserVoted)
 	router.Post("/story", handlers.NewStory)

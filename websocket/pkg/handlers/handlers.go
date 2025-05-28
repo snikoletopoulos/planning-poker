@@ -15,6 +15,25 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+func GetToken(w http.ResponseWriter, r *http.Request) {
+	authToken, ok := r.Context().Value("user").(auth.AuthToken)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching user"))
+		return
+	}
+
+	token, err := auth.CreateTempToken(authToken)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error creating token"))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(token))
+}
+
 func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
