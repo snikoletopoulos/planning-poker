@@ -84,7 +84,6 @@ func UserVoted(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Invalid request body"))
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 
 	user, ok := r.Context().Value("user").(auth.AuthToken)
 	if !ok {
