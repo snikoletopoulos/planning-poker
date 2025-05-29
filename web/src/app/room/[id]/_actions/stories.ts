@@ -67,6 +67,25 @@ export const completeStoryAction = async ({
 	}
 };
 
+export const uncompleteStoryAction = async (storyId: Story["id"]) => {
+	const story = await db.transaction(async tx => {
+		const [storiesResult] = await Promise.all([
+			tx
+				.update(stories)
+				.set({ isCompleted: false })
+				.where(eq(stories.id, storyId))
+				.returning(),
+			tx.delete(votes).where(eq(votes.storyId, storyId)),
+		]);
+
+		return storiesResult[0];
+	});
+
+	const token = await getUserToken(story.roomId);
+	if (!token) throw new Error("Unauthorized");
+	await updateClients(token, "uncompleteStory", { storyId });
+};
+
 export const voteForStoryAction = async ({
 	storyId,
 	vote,

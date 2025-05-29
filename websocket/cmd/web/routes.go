@@ -28,5 +28,6 @@ func registerRoutes(router *chi.Mux) {
 	router.Post("/vote", handlers.UserVoted)
 	router.Post("/story", handlers.NewStory)
 	router.Post("/reveal-story", handlers.RevealStory)
+	router.Post("/unreveal-story", handlers.UnrevealStory)
 	router.Post("/join", handlers.MemberJoined)
 }

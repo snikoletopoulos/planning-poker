@@ -12,6 +12,9 @@ interface UpdaterData {
 	completeStory: {
 		storyId: Story["id"];
 	};
+	uncompleteStory: {
+		storyId: Story["id"];
+	};
 	membersJoined: {
 		member: Pick<Member, "id" | "name">;
 		roomId: Room["id"];
@@ -37,5 +40,6 @@ const updaterEndpoint = {
 	userVoted: "/vote",
 	addStory: "/story",
 	completeStory: "/reveal-story",
+	uncompleteStory: "/unreveal-story",
 	membersJoined: "/join",
 } satisfies Record<keyof UpdaterData, string>;

@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowRightIcon, Eye, EyeOff } from "lucide-react";
+import { ArrowRightIcon, Eye, EyeOff, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/styles/utils";
+import { uncompleteStoryAction } from "../_actions/stories";
 import { useRoom } from "./RoomContext";
 
 const CARD_VALUES = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?"] as const;
@@ -53,22 +54,29 @@ export const VoteCard = () => {
 				</div>
 
 				<div className="mt-8 flex justify-center gap-8">
-					<Button
-						onClick={completeStory}
-						disabled={!!showVotes || activeStory.votes.length === 0}
-					>
-						{showVotes ? (
-							<>
-								<EyeOff className="mr-2 h-5 w-5" />
-								Revealed
-							</>
-						) : (
-							<>
-								<Eye className="mr-2 h-5 w-5" />
-								Reveal Cards
-							</>
-						)}
-					</Button>
+					{activeStory.isCompleted ? (
+						<Button onClick={() => uncompleteStoryAction(activeStory.id)}>
+							<RefreshCcw className="h-5 w-5" />
+							Repoker story
+						</Button>
+					) : (
+						<Button
+							onClick={completeStory}
+							disabled={!!showVotes || activeStory.votes.length === 0}
+						>
+							{showVotes ? (
+								<>
+									<EyeOff className="h-5 w-5" />
+									Revealed
+								</>
+							) : (
+								<>
+									<Eye className="h-5 w-5" />
+									Reveal Cards
+								</>
+							)}
+						</Button>
+					)}
 
 					<Button
 						variant="outline"

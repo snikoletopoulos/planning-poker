@@ -171,6 +171,32 @@ func RevealStory(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type UnrevealStoryBody struct {
+	StoryID string `json:"storyId" validate:"required"`
+}
+
+type UnrevealStoryWsPayload struct {
+	Action  string `json:"action" validate:"required"`
+	StoryID string `json:"storyId" validate:"required"`
+}
+
+func UnrevealStory(w http.ResponseWriter, r *http.Request) {
+	var body UnrevealStoryBody
+	json.NewDecoder(r.Body).Decode(&body)
+
+	user, ok := r.Context().Value("user").(auth.AuthToken)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching user"))
+		return
+	}
+
+	broadcastEvent(user.RoomID, UnrevealStoryWsPayload{
+		Action:  "unreveal_story",
+		StoryID: body.StoryID,
+	})
+}
+
 type Member struct {
 	ID   string `json:"id" validate:"required"`
 	Name string `json:"name" validate:"required"`

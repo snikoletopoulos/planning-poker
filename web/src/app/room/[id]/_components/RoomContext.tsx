@@ -209,6 +209,18 @@ export const RoomProvider = ({
 				changeActiveStory(nextStory.id);
 				break;
 			}
+			case "unreveal_story": {
+				setStories(stories => {
+					const story = stories.find(story => story.id === data.storyId);
+					if (!story) return stories;
+
+					story.votes = [];
+					story.isCompleted = false;
+
+					return [...stories];
+				});
+				break;
+			}
 		}
 	}, [lastJsonMessage, currentUser.id]);
 
@@ -274,6 +286,10 @@ const WsEventSchema = z.discriminatedUnion("action", [
 				storyId: z.string(),
 			} satisfies Record<keyof Vote, z.ZodTypeAny>),
 		),
+	}),
+	z.object({
+		action: z.literal("unreveal_story"),
+		storyId: z.string(),
 	}),
 	z.object({
 		action: z.literal("member_joined"),
