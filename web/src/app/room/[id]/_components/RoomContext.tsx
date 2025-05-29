@@ -187,6 +187,18 @@ export const RoomProvider = ({
 				});
 				break;
 			}
+			case "unreveal_story": {
+				setStories(stories => {
+					const story = stories.find(story => story.id === data.storyId);
+					if (!story) return stories;
+
+					story.votes = [];
+					story.isCompleted = false;
+
+					return [...stories];
+				});
+				break;
+			}
 			case "member_joined": {
 				setMembers(members => [...members, data.member]);
 				break;
@@ -207,18 +219,6 @@ export const RoomProvider = ({
 				const nextStory = stories.find(story => !story.isCompleted);
 				if (!nextStory) return;
 				changeActiveStory(nextStory.id);
-				break;
-			}
-			case "unreveal_story": {
-				setStories(stories => {
-					const story = stories.find(story => story.id === data.storyId);
-					if (!story) return stories;
-
-					story.votes = [];
-					story.isCompleted = false;
-
-					return [...stories];
-				});
 				break;
 			}
 		}
