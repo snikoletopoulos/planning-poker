@@ -171,9 +171,7 @@ export const RoomProvider = ({
 				});
 				break;
 			}
-			case "revel_story": {
-				// TODO
-				console.log("🪚 data:", data);
+			case "reveal_story": {
 				setStories(stories => {
 					const story = stories.find(story => story.id === data.storyId);
 					if (!story) return stories;
@@ -266,7 +264,7 @@ const WsEventSchema = z.discriminatedUnion("action", [
 		memberId: z.string(),
 	}),
 	z.object({
-		action: z.literal("revel_story"),
+		action: z.literal("reveal_story"),
 		storyId: z.string(),
 		votes: z.array(
 			z.object({

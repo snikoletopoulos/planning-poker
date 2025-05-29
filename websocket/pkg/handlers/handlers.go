@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"poker/websocket/pkg/auth"
+	"poker/websocket/pkg/db"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -138,10 +140,35 @@ type RevealStoryBody struct {
 	StoryID string `json:"storyId" validate:"required"`
 }
 
+type RevealStoryWsPayload struct {
+	Action  string    `json:"action" validate:"required"`
+	StoryID string    `json:"storyId" validate:"required"`
+	Votes   []db.Vote `json:"votes" validate:"required"`
+}
+
 func RevealStory(w http.ResponseWriter, r *http.Request) {
 	var body RevealStoryBody
 	json.NewDecoder(r.Body).Decode(&body)
-	// TODO: fetch votes
+
+	votes, err := db.GetStoryVotes(body.StoryID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching votes"))
+		return
+	}
+
+	user, ok := r.Context().Value("user").(auth.AuthToken)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching user"))
+		return
+	}
+
+	broadcastEvent(user.RoomID, RevealStoryWsPayload{
+		Action:  "reveal_story",
+		StoryID: body.StoryID,
+		Votes:   votes,
+	})
 }
 
 type Member struct {

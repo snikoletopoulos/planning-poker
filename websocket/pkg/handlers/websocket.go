@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -45,7 +44,6 @@ func receiveWsEvent(client WsConnection) {
 func ListenWsEvents() {
 	for {
 		event := <-wsChan
-		fmt.Println("🪚 event:", event)
 
 		switch event.Action {
 		case "next_story":
