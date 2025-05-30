@@ -4,6 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/Button";
@@ -103,7 +104,13 @@ const AddStory = ({ onComplete }: { onComplete: () => void }) => {
 
 	const handleAddStory = handleSubmit(async data => {
 		try {
-			await addStoryAction({ ...data, roomId: room.id });
+			await toast
+				.promise(addStoryAction({ ...data, roomId: room.id }), {
+					loading: "Adding story...",
+					success: "Story added successfully",
+					error: "Error adding story",
+				})
+				.unwrap();
 			reset();
 			onComplete();
 		} catch (error) {

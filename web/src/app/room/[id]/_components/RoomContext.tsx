@@ -10,6 +10,7 @@ import {
 	type PropsWithChildren,
 } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { useCurrentUser } from "@/components/CurrentUserProvider";
@@ -182,6 +183,7 @@ export const RoomProvider = ({
 
 					return [...stories];
 				});
+				toast("Story revealed");
 				break;
 			}
 			case "unreveal_story": {
@@ -194,6 +196,7 @@ export const RoomProvider = ({
 
 					return [...stories];
 				});
+				toast("Story is restarted");
 				break;
 			}
 			case "member_joined": {
@@ -213,6 +216,7 @@ export const RoomProvider = ({
 			}
 			case "next_story": {
 				setActiveStoryIndex(prevIndex => prevIndex + 1);
+				toast("Moving to next story");
 				break;
 			}
 		}
