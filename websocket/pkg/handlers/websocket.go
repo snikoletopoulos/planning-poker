@@ -19,8 +19,7 @@ type WsConnection struct {
 
 type WsPayload struct {
 	Client WsConnection
-	Action string
-	Data   any
+	Action string `json:"action"`
 }
 
 func receiveWsEvent(client WsConnection) {
@@ -31,13 +30,15 @@ func receiveWsEvent(client WsConnection) {
 	}()
 
 	for {
-		var message any
+		var message WsPayload
 		if err := client.Conn.ReadJSON(&message); err != nil {
 			log.Println("Error reading from websocket:", err)
 			client.Conn.Close()
 			deleteWsClient(&client)
 			return
 		}
+		message.Client = client
+		wsChan <- message
 	}
 }
 
