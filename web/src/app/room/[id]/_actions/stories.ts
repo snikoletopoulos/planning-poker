@@ -78,6 +78,7 @@ export const uncompleteStoryAction = async (storyId: Story["id"]) => {
 			tx.delete(votes).where(eq(votes.storyId, storyId)),
 		]);
 
+		if (!storiesResult[0]) throw new Error("Story not found");
 		return storiesResult[0];
 	});
 

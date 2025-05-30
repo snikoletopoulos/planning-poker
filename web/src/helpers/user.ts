@@ -31,6 +31,7 @@ export const createNewUser = async (
 			.values({ id: userId, name, roomId, accessToken: newToken })
 			.returning()
 	)[0];
+	if (!user) throw new Error("Failed to create user");
 
 	const cookieStore = await cookies();
 	cookieStore.set({

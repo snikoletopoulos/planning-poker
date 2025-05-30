@@ -41,22 +41,23 @@ const NewRoomPage = () => {
 				})
 				.returning();
 
-			if (!roomsResult[0]) tx.rollback();
+			const room = roomsResult[0];
+			if (!room) tx.rollback();
 
-			const { user, token } = await createNewUser(name, roomsResult[0].id, tx);
+			const { user, token } = await createNewUser(name, room!.id, tx);
 
 			const storiesData = stories.map(
 				({ title, description }) =>
 					({
 						title,
 						description: description ? description : "",
-						roomId: roomsResult[0].id,
+						roomId: room!.id,
 					}) satisfies NewStory,
 			);
 
 			await tx.insert(storiesTable).values(storiesData);
 
-			return { room: roomsResult[0], user, token };
+			return { room: room!, user, token };
 		});
 
 		try {

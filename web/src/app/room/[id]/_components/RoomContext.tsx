@@ -53,11 +53,13 @@ export const RoomProvider = ({
 	const [stories, setStories] = useState(initialStories);
 	const [members, setMembers] = useState(initialMembers);
 
-	const [activeStory, setActiveStory] = useState(
-		() => stories.find(story => !story.isCompleted) ?? stories[0],
-	);
+	const [activeStoryIndex, setActiveStoryIndex] = useState(() => {
+		const index = stories.findIndex(story => !story.isCompleted);
+		return index === -1 ? 0 : index;
+	});
+	const activeStory = stories[activeStoryIndex];
 	const [selectedCard, setSelectedCard] = useState<number | "?" | null>(() => {
-		const userVote = activeStory.votes.find(
+		const userVote = activeStory?.votes.find(
 			vote => vote.memberId === currentUser.id,
 		);
 		if (!userVote) return null;
@@ -65,39 +67,34 @@ export const RoomProvider = ({
 	});
 	const [isLiveUpdating, setIsLiveUpdating] = useState(false);
 
-	const changeActiveStory = useCallback(
-		(storyId: Story["id"]) => {
-			const story = stories.find(story => story.id === storyId);
-			if (!story) throw new Error("Story not found");
+	useEffect(() => {
+		const story = stories[activeStoryIndex];
+		if (!story) throw new Error("Story not found");
 
-			setActiveStory(story);
-
-			const userVote = story.votes.find(
-				vote => vote.memberId === currentUser.id,
-			);
-			if (!userVote) {
-				setSelectedCard(null);
-				return;
-			}
-			setSelectedCard(userVote.vote ? +userVote.vote : "?");
-		},
-		[stories, currentUser],
-	);
+		const userVote = story.votes.find(vote => vote.memberId === currentUser.id);
+		if (!userVote) {
+			setSelectedCard(null);
+			return;
+		}
+		setSelectedCard(userVote.vote ? +userVote.vote : "?");
+	}, [stories, activeStoryIndex, currentUser.id]);
 
 	const selectCard = useCallback(
 		async (card: number | "?" | null) => {
+			if (!activeStory) return;
 			setSelectedCard(card);
 			await voteForStoryAction({
 				storyId: activeStory.id,
 				vote: card === "?" ? null : card,
 			});
 		},
-		[activeStory.id],
+		[activeStory],
 	);
 
 	const completeStory = useCallback(
-		async () => await completeStoryAction({ storyId: activeStory.id }),
-		[activeStory.id],
+		async () =>
+			activeStory && (await completeStoryAction({ storyId: activeStory.id })),
+		[activeStory],
 	);
 
 	const getWsUrl = useCallback(async () => {
@@ -141,7 +138,7 @@ export const RoomProvider = ({
 							createdAt: new Date(),
 						});
 					} else {
-						story.votes[exitingVoteIndex].vote = data.vote;
+						story.votes[exitingVoteIndex]!.vote = data.vote;
 					}
 
 					return [...stories];
@@ -215,41 +212,49 @@ export const RoomProvider = ({
 				break;
 			}
 			case "next_story": {
-				// TODO
-				const nextStory = stories.find(story => !story.isCompleted);
-				if (!nextStory) return;
-				changeActiveStory(nextStory.id);
+				setActiveStoryIndex(prevIndex => prevIndex + 1);
 				break;
 			}
 		}
 	}, [lastJsonMessage, currentUser.id]);
 
-	const value = useMemo(
-		() => ({
-			room,
-			stories,
-			members,
-			activeStory,
-			changeActiveStory,
-			selectedCard,
-			selectCard,
-			completeStory,
-			isLiveUpdating,
-			nextStory,
-		}),
-		[
-			room,
-			stories,
-			members,
-			activeStory,
-			changeActiveStory,
-			selectedCard,
-			selectCard,
-			completeStory,
-			isLiveUpdating,
-			nextStory,
-		],
+	const changeActiveStory = useCallback(
+		(storyId: Story["id"]) => {
+			const storyIndex = stories.findIndex(story => story.id === storyId);
+			if (storyIndex === -1) return;
+			setActiveStoryIndex(storyIndex);
+		},
+		[stories],
 	);
+
+	const value = useMemo(() => {
+		if (!activeStory) return null;
+		return {
+			room,
+			stories,
+			members,
+			activeStory,
+			changeActiveStory,
+			selectedCard,
+			selectCard,
+			completeStory,
+			isLiveUpdating,
+			nextStory,
+		};
+	}, [
+		room,
+		stories,
+		members,
+		activeStory,
+		changeActiveStory,
+		selectedCard,
+		selectCard,
+		completeStory,
+		isLiveUpdating,
+		nextStory,
+	]);
+
+	if (!value) return null;
 
 	return <RoomContext.Provider value={value}>{children}</RoomContext.Provider>;
 };
