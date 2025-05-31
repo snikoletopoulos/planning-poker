@@ -7,10 +7,6 @@ const EnvSchema = z.object({
 	NEXT_PUBLIC_UPDATER_HTTP_URL: z.string().url(),
 });
 
-console.log("Verifying environment variables...", {
-	EnvSchema: process.env.NEXT_PUBLIC_UPDATER_WS_URL,
-});
-
 try {
 	EnvSchema.parse(process.env);
 } catch (error) {
