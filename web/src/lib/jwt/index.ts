@@ -3,20 +3,23 @@ import { z } from "zod";
 
 import type { Member, Room } from "../db/schema";
 
-const SECRET = "secret";
-
 export const createToken = (payload: {
 	id: Member["id"];
 	name: string;
 	roomId: Room["id"];
-}) => sign(payload, SECRET);
+}) => sign(payload, process.env.AUTH_SECRET);
 
 export const parseToken = (token: string) => {
-	const tokenData = verify(token, SECRET);
-	if (!tokenData) return null;
+	try {
+		const tokenData = verify(token, process.env.AUTH_SECRET);
+		if (!tokenData) return null;
 
-	const data = TokenSchema.parse(tokenData);
-	return data;
+		const data = TokenSchema.parse(tokenData);
+		return data;
+	} catch (error) {
+		console.error("[PARSE_TOKEN:INVALID]", error);
+		return null;
+	}
 };
 
 const TokenSchema = z.object({

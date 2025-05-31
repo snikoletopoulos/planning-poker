@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/lestrrat-go/jwx/jwa"
@@ -16,12 +17,12 @@ type AuthToken struct {
 	RoomID string
 }
 
-const SECRET = "secret"
+const authSecretEnvName = "AUTH_SECRET"
 
 var ephemeralTokens = make(map[string]*AuthToken)
 
 func ParseToken(ctx context.Context, token string) (AuthToken, error) {
-	data, err := jwt.Parse([]byte(token), jwt.WithVerify(jwa.HS256, []byte(SECRET)))
+	data, err := jwt.Parse([]byte(token), jwt.WithVerify(jwa.HS256, []byte(os.Getenv(authSecretEnvName))))
 	if err != nil {
 		return AuthToken{}, err
 	}
@@ -47,16 +48,18 @@ func ParseToken(ctx context.Context, token string) (AuthToken, error) {
 	}, nil
 }
 
+const authTokenLifetime = time.Second * 3
+
 func CreateTempToken(authToken AuthToken) (string, error) {
 	token, err := jwt.NewBuilder().
-		Expiration(time.Now().Add(time.Second * 3)).
+		Expiration(time.Now().Add(authTokenLifetime)).
 		IssuedAt(time.Now()).
 		Build()
 	if err != nil {
 		return "", err
 	}
 
-	signedTokenBytes, err := jwt.Sign(token, jwa.HS256, []byte(SECRET))
+	signedTokenBytes, err := jwt.Sign(token, jwa.HS256, []byte(os.Getenv(authSecretEnvName)))
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +69,7 @@ func CreateTempToken(authToken AuthToken) (string, error) {
 	ephemeralTokens[signedToken] = &authToken
 
 	go func() {
-		time.Sleep(time.Second * 3)
+		time.Sleep(authTokenLifetime)
 		delete(ephemeralTokens, signedToken)
 	}()
 

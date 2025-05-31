@@ -100,7 +100,7 @@ export const RoomProvider = ({
 
 	const getWsUrl = useCallback(async () => {
 		const token = await getWsToken(authToken);
-		return `${process.env.NEXT_PUBLIC_WS_PROTOCOL}://${process.env.NEXT_PUBLIC_WS_URI}?token=${encodeURIComponent(token)}`;
+		return `${process.env.NEXT_PUBLIC_UPDATER_WS_URL}?token=${encodeURIComponent(token)}`;
 	}, [authToken]);
 
 	const { lastJsonMessage, readyState, sendJsonMessage } = useWebSocket(

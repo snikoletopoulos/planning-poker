@@ -15,6 +15,8 @@ const (
 )
 
 func main() {
+	setupEnvVars()
+
 	db.InitDB()
 	go handlers.ListenWsEvents()
 
