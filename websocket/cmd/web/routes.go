@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"poker/websocket/pkg/handlers"
 
 	"github.com/go-chi/chi/v5"
@@ -10,9 +12,9 @@ import (
 
 func registerMiddlewares(router *chi.Mux) {
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedOrigins: []string{os.Getenv("APP_URL")},
 		AllowedMethods: []string{"GET"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
 		MaxAge:         300,
 	}))
 	router.Use(middleware.RequestID)
