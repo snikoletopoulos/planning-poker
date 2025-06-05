@@ -7,11 +7,18 @@ const EnvSchema = z.object({
 	NEXT_PUBLIC_UPDATER_HTTP_URL: z.string().url(),
 });
 
-try {
-	EnvSchema.parse(process.env);
-} catch (error) {
-	console.error("Error verifying environment variables:", error);
-	process.exit(1);
+if (!process.env.DOCKER_BUILD) {
+	try {
+		EnvSchema.parse({
+			DB_FILE_NAME: process.env.DB_FILE_NAME,
+			AUTH_SECRET: process.env.AUTH_SECRET,
+			NEXT_PUBLIC_UPDATER_WS_URL: process.env.NEXT_PUBLIC_UPDATER_WS_URL,
+			NEXT_PUBLIC_UPDATER_HTTP_URL: process.env.NEXT_PUBLIC_UPDATER_HTTP_URL,
+		});
+	} catch (error) {
+		console.error("Error verifying environment variables:", error);
+		process.exit(1);
+	}
 }
 
 declare global {

@@ -1,5 +1,7 @@
 FROM node:22-alpine AS base
 
+ENV NEXT_TELEMETRY_DISABLED=1
+
 FROM base AS builder
 
 WORKDIR /app 
@@ -19,6 +21,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 ENV NODE_ENV=production
+ENV DOCKER_BUILD=true
 
 RUN pnpm build
 
