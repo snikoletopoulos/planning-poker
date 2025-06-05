@@ -16,6 +16,7 @@ const compat = new FlatCompat({
 });
 
 export default tseslint.config(
+	{ ignores: ["src/lib/db/migrations/*"] },
 	{
 		name: "Main options",
 		languageOptions: {
