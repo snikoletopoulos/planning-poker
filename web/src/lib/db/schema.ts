@@ -11,8 +11,8 @@ export const rooms = sqliteTable("rooms", {
 		.primaryKey()
 		.$defaultFn(() => createId()),
 	name: text().notNull(),
-	createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
-	isActive: int({ mode: "boolean" }).default(true),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
+	isActive: int("is_active", { mode: "boolean" }).default(true),
 });
 
 export type Room = InferSelectModel<typeof rooms>;
@@ -29,9 +29,9 @@ export const stories = sqliteTable("stories", {
 		.$defaultFn(() => createId()),
 	title: text().notNull(),
 	description: text(),
-	createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
-	isCompleted: int({ mode: "boolean" }).default(false),
-	roomId: text()
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
+	isCompleted: int("is_completed", { mode: "boolean" }).default(false),
+	roomId: text("room_id")
 		.notNull()
 		.references(() => rooms.id),
 });
@@ -52,11 +52,11 @@ export const members = sqliteTable("members", {
 		.primaryKey()
 		.$defaultFn(() => createId()),
 	name: text().notNull(),
-	roomId: text()
+	roomId: text("room_id")
 		.notNull()
 		.references(() => rooms.id),
-	accessToken: text().notNull(),
-	createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
+	accessToken: text("access_token").notNull(),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
 });
 
 export type Member = InferSelectModel<typeof members>;
@@ -73,14 +73,14 @@ export const memberRelations = relations(members, ({ many, one }) => ({
 export const votes = sqliteTable(
 	"votes",
 	{
-		memberId: text()
+		memberId: text("member_id")
 			.notNull()
 			.references(() => members.id),
-		storyId: text()
+		storyId: text("story_id")
 			.notNull()
 			.references(() => stories.id),
 		vote: int(),
-		createdAt: int({ mode: "timestamp" }).notNull().defaultNow(),
+		createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
 	},
 	t => [primaryKey({ columns: [t.memberId, t.storyId] })],
 );

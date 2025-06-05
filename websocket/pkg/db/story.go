@@ -7,12 +7,12 @@ import (
 type Vote struct {
 	MemberID  string `json:"memberId"`
 	StoryID   string `json:"storyId"`
-	Vote      *int    `json:"vote"`
+	Vote      *int   `json:"vote"`
 	CreatedAt string `json:"createdAt"`
 }
 
 func GetStoryVotes(storyID string) ([]Vote, error) {
-	rows, err := DB.Query("SELECT storyId, memberId, vote, createdAt FROM votes WHERE storyId = ?", storyID)
+	rows, err := DB.Query("SELECT story_id, member_id, vote, created_at FROM votes WHERE story_id = ?", storyID)
 	if err != nil {
 		return nil, err
 	}
