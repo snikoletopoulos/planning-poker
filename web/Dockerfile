@@ -23,12 +23,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV DOCKER_BUILD=true
 
-ARG DB_FILE_NAME
-ENV DB_FILE_NAME=$DB_FILE_NAME
-
 RUN pnpm build
-
-RUN pnpm db:migrate
 
 FROM base AS runner
 
