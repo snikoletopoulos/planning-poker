@@ -1,0 +1,21 @@
+name: planning-poker
+
+services:
+  web:
+    build:
+      context: web
+    env_file: web/.env.production
+    volumes:
+      - ./db:/app/db
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+
+  websocket:
+    build: websocket
+    env_file: web/.env.production
+    volumes:
+      - ./db:/app/db
+    ports:
+      - 3001:3001
+    restart: unless-stopped
