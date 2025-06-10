@@ -27,7 +27,7 @@ export const updateClients = async <TEvent extends keyof UpdaterData>(
 	data: UpdaterData[TEvent],
 ) => {
 	await fetch(
-		`${process.env.NEXT_PUBLIC_UPDATER_HTTP_URL}/${updaterEndpoint[event]}`,
+		`${process.env.NEXT_PUBLIC_UPDATER_HTTP_URL}${updaterEndpoint[event]}`,
 		{
 			method: "POST",
 			headers: { Authorization: `Bearer ${token}` },
