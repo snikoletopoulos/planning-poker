@@ -31,46 +31,47 @@ const NewRoomPage = () => {
 	}: CreateRoomFormData) => {
 		"use server";
 
-		const { room, token, user } = await db.transaction(async tx => {
-			const roomsResult = await tx
+		const { roomId } = db.transaction(tx => {
+			const roomsResult = tx
 				.insert(rooms)
 				.values({
 					name: roomName,
 					isActive: true,
 					createdAt: new Date(),
 				})
-				.returning();
+				.returning()
+				.get();
 
-			const room = roomsResult[0];
-			if (!room) tx.rollback();
-
-			const { user, token } = await createNewUser(name, room!.id, tx);
+			const roomId = roomsResult.id;
+			if (!roomId) tx.rollback();
 
 			const storiesData = stories.map(
 				({ title, description }) =>
 					({
 						title,
 						description: description ? description : "",
-						roomId: room!.id,
+						roomId,
 					}) satisfies NewStory,
 			);
 
-			await tx.insert(storiesTable).values(storiesData);
+			tx.insert(storiesTable).values(storiesData).run();
 
-			return { room: room!, user, token };
+			return { roomId };
 		});
+
+		const { user, token } = await createNewUser(name, roomId);
 
 		try {
 			await updateClients(token, "membersJoined", {
-				roomId: room.id,
+				roomId,
 				member: user,
 			});
 		} catch (error) {
 			console.error("Error updating live data: (createNewUser)", error);
-			revalidatePath(`/room/${room.id}`);
+			revalidatePath(`/room/${roomId}`);
 		}
 
-		return room.id;
+		return roomId;
 	};
 
 	return (
