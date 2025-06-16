@@ -4,8 +4,9 @@
 
 1. Clone the repository
 2. Create a `.env.production` file in the web folder with the contents of `.env.example`
-3. Run `npx drizzle-kit migrate` to create the SQLite database
-4. Run `docker compose up`
+3. Change the `NEXT_PUBLIC_UPDATER_WS_URL` and `NEXT_PUBLIC_UPDATER_HTTP_URL` in `./web/Dockerfile`
+4. Run `npx drizzle-kit migrate` to create the SQLite database
+5. Run `docker compose up`
 
 ## Development
 
