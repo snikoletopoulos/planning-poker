@@ -26,8 +26,8 @@ const CreateRoomSchema = z.object({
 	stories: z
 		.array(
 			z.object({
-				title: z.string().min(1, "Story title is required"),
-				description: z.string(),
+				title: z.string().trim().min(1, "Story title is required"),
+				description: z.string().trim(),
 			}),
 		)
 		.min(1, "At least one story is required"),
