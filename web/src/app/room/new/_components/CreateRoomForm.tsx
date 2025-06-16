@@ -33,8 +33,6 @@ const CreateRoomSchema = z.object({
 		.min(1, "At least one story is required"),
 });
 
-export type CreateRoomFormData = z.infer<typeof CreateRoomSchema>;
-
 const { formControl, register, handleSubmit, control, setError } =
 	createFormControl({
 		resolver: zodResolver(CreateRoomSchema),

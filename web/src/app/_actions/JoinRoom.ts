@@ -9,14 +9,19 @@ import { db } from "@/lib/db";
 import { updateClients } from "@/services/live-update";
 
 const JoinRoomInputSchema = z.object({
-	name: z.string().min(1, "Name is required"),
-	roomCode: z.string().min(1, "Room code is required"),
+	name: z.string().trim().min(1, "Name is required"),
+	roomCode: z.string().trim().min(1, "Room code is required"),
 });
 
-export const joinRoomAction = async ({
-	name,
-	roomCode,
-}: z.infer<typeof JoinRoomInputSchema>) => {
+export const joinRoomAction = async (
+	data: z.infer<typeof JoinRoomInputSchema>,
+) => {
+	const result = JoinRoomInputSchema.safeParse(data);
+	if (!result.success) {
+		throw new Error(result.error.message);
+	}
+	const { name, roomCode } = result.data;
+
 	const room = await db.query.rooms.findFirst({
 		where: (rooms, { eq }) => eq(rooms.id, roomCode),
 		with: { members: true },
