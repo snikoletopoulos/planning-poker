@@ -10,7 +10,7 @@ COPY . .
 
 ENV CGO_ENABLED=1
 
-RUN go build -ldflags="-w -s" -o main ./cmd/web
+RUN make build
 
 FROM debian:bookworm-slim AS runner
 
