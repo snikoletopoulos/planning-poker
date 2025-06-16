@@ -59,27 +59,12 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 	go receiveWsEvent(client)
 }
 
-type UserVoteBody struct {
-	MemberID string `json:"memberId" validate:"required"`
-	StoryID  string `json:"storyId" validate:"required"`
-	Vote     *int   `json:"vote" validate:"required"`
-}
-
-type SelfVoteWsPayload struct {
-	Action   string `json:"action" validate:"required"`
-	MemberID string `json:"memberId" validate:"required"`
-	StoryID  string `json:"storyId" validate:"required"`
-	Vote     *int   `json:"vote" validate:"required"`
-}
-
-type MemberVoteWsPayload struct {
-	Action   string `json:"action" validate:"required"`
-	MemberID string `json:"memberId" validate:"required"`
-	StoryID  string `json:"storyId" validate:"required"`
-}
-
 func UserVoted(w http.ResponseWriter, r *http.Request) {
-	var body UserVoteBody
+	var body struct {
+		MemberID string `json:"memberId" validate:"required"`
+		StoryID  string `json:"storyId" validate:"required"`
+		Vote     *int   `json:"vote" validate:"required"`
+	}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -97,7 +82,12 @@ func UserVoted(w http.ResponseWriter, r *http.Request) {
 	roomClients := wsClients[user.RoomID]
 	for _, client := range roomClients {
 		if client.UserID == user.ID {
-			client.Conn.WriteJSON(SelfVoteWsPayload{
+			client.Conn.WriteJSON(struct {
+				Action   string `json:"action" validate:"required"`
+				MemberID string `json:"memberId" validate:"required"`
+				StoryID  string `json:"storyId" validate:"required"`
+				Vote     *int   `json:"vote" validate:"required"`
+			}{
 				Action:   "self_voted",
 				MemberID: body.MemberID,
 				StoryID:  body.StoryID,
@@ -106,14 +96,18 @@ func UserVoted(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	broadcastEvent(user.RoomID, MemberVoteWsPayload{
+	broadcastEvent(user.RoomID, struct {
+		Action   string `json:"action" validate:"required"`
+		MemberID string `json:"memberId" validate:"required"`
+		StoryID  string `json:"storyId" validate:"required"`
+	}{
 		Action:   "user_voted",
 		MemberID: body.MemberID,
 		StoryID:  body.StoryID,
 	})
 }
 
-type NewStoryBody struct {
+type Story struct {
 	ID          string  `json:"id" validate:"required"`
 	Title       string  `json:"title" validate:"required"`
 	Description *string `json:"description" validate:"required"`
@@ -122,32 +116,22 @@ type NewStoryBody struct {
 	CreatedAt   string  `json:"createdAt" validate:"required"`
 }
 
-type NewStoryWsPayload struct {
-	Action string       `json:"action" validate:"required"`
-	Story  NewStoryBody `json:"story" validate:"required"`
-}
-
 func NewStory(w http.ResponseWriter, r *http.Request) {
-	var story NewStoryBody
+	var story Story
 	json.NewDecoder(r.Body).Decode(&story)
-	broadcastEvent(story.RoomID, NewStoryWsPayload{
+	broadcastEvent(story.RoomID, struct {
+		Action string `json:"action" validate:"required"`
+		Story  Story  `json:"story" validate:"required"`
+	}{
 		Action: "new_story",
 		Story:  story,
 	})
 }
 
-type RevealStoryBody struct {
-	StoryID string `json:"storyId" validate:"required"`
-}
-
-type RevealStoryWsPayload struct {
-	Action  string    `json:"action" validate:"required"`
-	StoryID string    `json:"storyId" validate:"required"`
-	Votes   []db.Vote `json:"votes" validate:"required"`
-}
-
 func RevealStory(w http.ResponseWriter, r *http.Request) {
-	var body RevealStoryBody
+	var body struct {
+		StoryID string `json:"storyId" validate:"required"`
+	}
 	json.NewDecoder(r.Body).Decode(&body)
 
 	votes, err := db.GetStoryVotes(body.StoryID)
@@ -164,24 +148,21 @@ func RevealStory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	broadcastEvent(user.RoomID, RevealStoryWsPayload{
+	broadcastEvent(user.RoomID, struct {
+		Action  string    `json:"action" validate:"required"`
+		StoryID string    `json:"storyId" validate:"required"`
+		Votes   []db.Vote `json:"votes" validate:"required"`
+	}{
 		Action:  "reveal_story",
 		StoryID: body.StoryID,
 		Votes:   votes,
 	})
 }
 
-type UnrevealStoryBody struct {
-	StoryID string `json:"storyId" validate:"required"`
-}
-
-type UnrevealStoryWsPayload struct {
-	Action  string `json:"action" validate:"required"`
-	StoryID string `json:"storyId" validate:"required"`
-}
-
 func UnrevealStory(w http.ResponseWriter, r *http.Request) {
-	var body UnrevealStoryBody
+	var body struct {
+		StoryID string `json:"storyId" validate:"required"`
+	}
 	json.NewDecoder(r.Body).Decode(&body)
 
 	user, ok := r.Context().Value("user").(auth.AuthToken)
@@ -191,7 +172,10 @@ func UnrevealStory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	broadcastEvent(user.RoomID, UnrevealStoryWsPayload{
+	broadcastEvent(user.RoomID, struct {
+		Action  string `json:"action" validate:"required"`
+		StoryID string `json:"storyId" validate:"required"`
+	}{
 		Action:  "unreveal_story",
 		StoryID: body.StoryID,
 	})
@@ -202,20 +186,17 @@ type Member struct {
 	Name string `json:"name" validate:"required"`
 }
 
-type MemberBody struct {
-	RoomID string `json:"roomId" validate:"required"`
-	Member Member `json:"member" validate:"required"`
-}
-
-type MemberWsPayload struct {
-	Action string `json:"action" validate:"required"`
-	Member Member `json:"member" validate:"required"`
-}
-
 func MemberJoined(w http.ResponseWriter, r *http.Request) {
-	var body MemberBody
+	var body struct {
+		RoomID string `json:"roomId" validate:"required"`
+		Member Member `json:"member" validate:"required"`
+	}
+
 	json.NewDecoder(r.Body).Decode(&body)
-	broadcastEvent(body.RoomID, MemberWsPayload{
+	broadcastEvent(body.RoomID, struct {
+		Action string `json:"action" validate:"required"`
+		Member Member `json:"member" validate:"required"`
+	}{
 		Action: "member_joined",
 		Member: body.Member,
 	})
