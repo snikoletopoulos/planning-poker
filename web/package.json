@@ -12,7 +12,7 @@
 		"lint:ts": "tsc",
 		"db:migrate": "drizzle-kit migrate",
 		"db:generate": "drizzle-kit generate",
-		"format": "prettier --write ."
+		"format": "prettier --write src"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.0.1",
