@@ -82,7 +82,7 @@ const RoomPage = async ({ params }: PageProps<Params>) => {
 
 	room.stories = stories;
 
-	const authToken = await getUserToken(roomId)
+	const authToken = await getUserToken(roomId);
 	if (!authToken) return null;
 
 	return (

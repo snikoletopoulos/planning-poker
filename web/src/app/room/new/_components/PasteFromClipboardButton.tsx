@@ -16,7 +16,7 @@ export const PasteFromClipboardButton = ({
 
 	return (
 		<Button
-		  variant="secondary"
+			variant="secondary"
 			className="w-full"
 			disabled={loading}
 			onClick={handlePasteFromClipboard}
