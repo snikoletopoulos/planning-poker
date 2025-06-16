@@ -22,6 +22,8 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV DOCKER_BUILD=true
+ENV NEXT_PUBLIC_UPDATER_WS_URL="ws://localhost:3001"
+ENV NEXT_PUBLIC_UPDATER_HTTP_URL="http://localhost:3001"
 
 RUN pnpm build
 
