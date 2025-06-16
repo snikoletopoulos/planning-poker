@@ -9,6 +9,8 @@ import { stories, votes, type Room, type Story } from "@/lib/db/schema";
 import { updateClients } from "@/services/live-update";
 import type { AddStoryData } from "../_components/StoriesSidebar";
 
+// TODO: validate data
+
 export const addStoryAction = async ({
 	roomId,
 	title,
@@ -68,14 +70,13 @@ export const completeStoryAction = async ({
 };
 
 export const uncompleteStoryAction = async (storyId: Story["id"]) => {
-	const story = await db.transaction(async tx => {
+	const story = db.transaction(tx => {
 		const story = tx
 			.update(stories)
 			.set({ isCompleted: false })
 			.where(eq(stories.id, storyId))
 			.returning()
 			.get();
-		if (!story) tx.rollback();
 
 		tx.delete(votes).where(eq(votes.storyId, storyId)).run();
 		return story;
