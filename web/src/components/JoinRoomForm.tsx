@@ -118,5 +118,3 @@ const JoinRoomSchema = z.object({
 	roomCode: z.string().min(1, "Room code is required"),
 	name: z.string().min(1, "Name is required"),
 });
-
-export type JoinRoomFormData = z.infer<typeof JoinRoomSchema>;

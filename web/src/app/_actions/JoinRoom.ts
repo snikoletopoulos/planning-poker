@@ -2,13 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { z } from "zod";
 
-import type { JoinRoomFormData } from "@/components/JoinRoomForm";
 import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";
 import { updateClients } from "@/services/live-update";
 
-export const joinRoomAction = async ({ name, roomCode }: JoinRoomFormData) => {
+const JoinRoomInputSchema = z.object({
+	name: z.string().min(1, "Name is required"),
+	roomCode: z.string().min(1, "Room code is required"),
+});
+
+export const joinRoomAction = async ({
+	name,
+	roomCode,
+}: z.infer<typeof JoinRoomInputSchema>) => {
 	const room = await db.query.rooms.findFirst({
 		where: (rooms, { eq }) => eq(rooms.id, roomCode),
 		with: { members: true },
