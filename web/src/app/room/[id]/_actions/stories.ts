@@ -69,17 +69,16 @@ export const completeStoryAction = async ({
 
 export const uncompleteStoryAction = async (storyId: Story["id"]) => {
 	const story = await db.transaction(async tx => {
-		const [storiesResult] = await Promise.all([
-			tx
-				.update(stories)
-				.set({ isCompleted: false })
-				.where(eq(stories.id, storyId))
-				.returning(),
-			tx.delete(votes).where(eq(votes.storyId, storyId)),
-		]);
+		const story = tx
+			.update(stories)
+			.set({ isCompleted: false })
+			.where(eq(stories.id, storyId))
+			.returning()
+			.get();
+		if (!story) tx.rollback();
 
-		if (!storiesResult[0]) throw new Error("Story not found");
-		return storiesResult[0];
+		tx.delete(votes).where(eq(votes.storyId, storyId)).run();
+		return story;
 	});
 
 	const token = await getUserToken(story.roomId);
