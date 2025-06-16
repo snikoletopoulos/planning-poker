@@ -23,8 +23,8 @@ export const generateMetadata: GenerateMetadata<Params> = async ({
 	const roomId = (await params).id;
 
 	try {
-		const room = await getRoomData(roomId);
-		return { title: room.name };
+		const {name} = await getRoomData(roomId);
+		return { title: name };
 	} catch {
 		notFound();
 	}
