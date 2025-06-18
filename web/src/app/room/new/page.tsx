@@ -28,7 +28,7 @@ const CreateRoomInputSchema = z.object({
 	stories: z.array(
 		z.object({
 			title: z.string().trim().min(1, "Story title is required"),
-			description: z.string().trim().min(1, "Story description is required"),
+			description: z.string().trim(),
 		}),
 	),
 });
