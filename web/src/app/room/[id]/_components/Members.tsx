@@ -37,7 +37,7 @@ export const Members = () => {
 										</AvatarFallback>
 									</Avatar>
 
-									{vote && !showVotes && (
+									{vote != null && !showVotes && (
 										<div className="bg-muted text-muted-foreground border-border absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-bold">
 											✓
 										</div>

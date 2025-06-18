@@ -77,7 +77,7 @@ export const RoomProvider = ({
 			setSelectedCard(null);
 			return;
 		}
-		setSelectedCard(userVote.vote ? +userVote.vote : "?");
+		setSelectedCard(userVote.vote != null ? +userVote.vote : "?");
 	}, [stories, activeStoryIndex, currentUser.id]);
 
 	const selectCard = useCallback(
