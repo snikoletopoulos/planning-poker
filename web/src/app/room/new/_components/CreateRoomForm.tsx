@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
 	createFormControl,
+	FormProvider,
 	useFieldArray,
 	useForm,
 	useFormState,
@@ -53,9 +54,11 @@ export const CreateRoomForm = ({
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 
+	const form = useForm({ formControl });
 	const {
 		formState: { isValid, isSubmitting, errors },
-	} = useForm({ formControl });
+	} = form;
+	console.log("🪚 errors:", errors);
 
 	const {
 		fields: stories,
@@ -77,89 +80,89 @@ export const CreateRoomForm = ({
 	});
 
 	return (
-		<>
-			<CardContent className="space-y-6">
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<div className="space-y-2">
-						<Label htmlFor="room-name">Room Name</Label>
-						<Input
-							id="room-name"
-							{...register("roomName")}
-							placeholder="Sprint Planning"
-						/>
-						{errors.roomName && (
-							<p className="text-sm text-red-500">{errors.roomName.message}</p>
-						)}
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="name">Your Name</Label>
-						<Input
-							id="name"
-							{...register("name")}
-							placeholder="Enter your name"
-						/>
-						{errors.name && (
-							<p className="text-sm text-red-500">{errors.name.message}</p>
-						)}
-					</div>
-				</div>
-
-				<div>
-					<Label>Stories to Estimate</Label>
-
-					<div className="mt-2 space-y-4">
-						{stories.map((story, index) => (
-							<StoryInput
-								key={story.id}
-								index={index}
-								showDeleteButton={stories.length > 1}
-								onRemove={() => remove(index)}
+		<FormProvider {...form}>
+			<form onSubmit={handleCreateRoom}>
+				<CardContent className="space-y-6">
+					<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+						<div className="space-y-2">
+							<Label htmlFor="room-name">Room Name</Label>
+							<Input
+								id="room-name"
+								{...register("roomName")}
+								placeholder="Sprint Planning"
 							/>
-						))}
-						{errors.stories && (
-							<p className="text-sm text-red-500">{errors.stories.message}</p>
-						)}
+							{errors.roomName && (
+								<p className="text-sm text-red-500">
+									{errors.roomName.message}
+								</p>
+							)}
+						</div>
 
-						<div className="flex items-center justify-between gap-4">
-							<PasteFromClipboardButton
-								loading={isPending}
-								addStory={title => {
-									startTransition(() => {
-										append({ title, description: "" });
-									});
-								}}
+						<div className="space-y-2">
+							<Label htmlFor="name">Your Name</Label>
+							<Input
+								id="name"
+								{...register("name")}
+								placeholder="Enter your name"
 							/>
-
-							<Button
-								variant="secondary"
-								onClick={() => append({ title: "", description: "" })}
-								className="w-full"
-							>
-								<Plus />
-								Add Another Story
-							</Button>
+							{errors.name && (
+								<p className="text-sm text-red-500">{errors.name.message}</p>
+							)}
 						</div>
 					</div>
-				</div>
-			</CardContent>
 
-			<CardFooter>
-				<Button
-					onClick={handleCreateRoom}
-					className="w-full"
-					disabled={!isValid || isSubmitting}
-				>
-					Create Room
-				</Button>
-			</CardFooter>
+					<div>
+						<Label>Stories to Estimate</Label>
 
-			{errors.root && (
-				<p className="mb-5 text-center text-sm text-red-500">
-					{errors.root.message}
-				</p>
-			)}
-		</>
+						<div className="mt-2 space-y-4">
+							{stories.map((story, index) => (
+								<StoryInput
+									key={story.id}
+									index={index}
+									showDeleteButton={stories.length > 1}
+									onRemove={() => remove(index)}
+								/>
+							))}
+							{errors.stories && (
+								<p className="text-sm text-red-500">{errors.stories.message}</p>
+							)}
+
+							<div className="flex items-center justify-between gap-4">
+								<PasteFromClipboardButton
+									loading={isPending}
+									addStory={title => {
+										startTransition(() => {
+											append({ title, description: "" });
+										});
+									}}
+								/>
+
+								<Button
+									variant="secondary"
+									onClick={() => append({ title: "", description: "" })}
+									className="w-full"
+								>
+									<Plus />
+									Add Another Story
+								</Button>
+							</div>
+						</div>
+					</div>
+				</CardContent>
+
+				<CardFooter>
+					<Button className="w-full" disabled={!isValid || isSubmitting}>
+						Create Room
+					</Button>
+				</CardFooter>
+
+				{errors.root && (
+					<p className="mb-5 text-center text-sm text-red-500">
+						{errors.root.message}
+					</p>
+				)}
+			</form>
+		</FormProvider>
 	);
 };
 
@@ -192,7 +195,7 @@ export const StoryInput = ({
 			</div>
 
 			<div className="space-y-3">
-				<div>
+				<div className="space-y-2">
 					<Label htmlFor={`story-title-${index}`}>Title</Label>
 					<Input
 						id={`story-title-${index}`}
@@ -207,7 +210,7 @@ export const StoryInput = ({
 					)}
 				</div>
 
-				<div>
+				<div className="space-y-2">
 					<Label htmlFor={`story-desc-${index}`}>Description</Label>
 					<Textarea
 						id={`story-desc-${index}`}
