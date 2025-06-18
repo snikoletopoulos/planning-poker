@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Users } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -28,12 +27,10 @@ export const JoinRoomForm = ({
 }: {
 	onSubmitAction: (
 		data: z.infer<typeof JoinRoomSchema>,
-	) => Promise<Room["id"] | { error: string }>;
+	) => Promise<{ error: string }>;
 	roomName?: string;
 	roomCode?: Room["id"];
 }) => {
-	const router = useRouter();
-
 	const {
 		register,
 		handleSubmit,
@@ -50,11 +47,7 @@ export const JoinRoomForm = ({
 	const handleJoinRoom = handleSubmit(async data => {
 		try {
 			const result = await onSubmitAction(data);
-			if (typeof result === "object") {
-				toast.error(result.error);
-				return;
-			}
-			router.push(`/room/${result}`);
+			toast.error(result.error);
 		} catch (error) {
 			console.error("[JOIN_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });
