@@ -2,21 +2,35 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 import { getCurrentUser, getUserToken } from "@/helpers/user";
 import { db } from "@/lib/db";
-import { stories, votes, type Room, type Story } from "@/lib/db/schema";
+import { stories, votes } from "@/lib/db/schema";
 import { updateClients } from "@/services/live-update";
-import type { AddStoryData } from "../_components/StoriesSidebar";
 
-// TODO: validate data
+const AddStoryInputSchema = z.object({
+	roomId: z
+		.string()
+		.trim()
+		.refine(async roomId => {
+			const room = await db.query.rooms.findFirst({
+				where: (rooms, { eq }) => eq(rooms.id, roomId),
+			});
+			return !!room;
+		}, "Room not found"),
+	title: z.string().trim().min(1, "Story title is required"),
+	description: z.string().trim().nullable(),
+});
 
-export const addStoryAction = async ({
-	roomId,
-	title,
-	description,
-}: AddStoryData & { roomId: Room["id"] }) => {
-	const result = await db
+export const addStoryAction = async (
+	data: z.infer<typeof AddStoryInputSchema>,
+) => {
+	const result = await AddStoryInputSchema.safeParseAsync(data);
+	if (!result.success) throw new Error(result.error.message);
+	const { roomId, title, description } = result.data;
+
+	const storiesResult = await db
 		.insert(stories)
 		.values({
 			roomId,
@@ -26,13 +40,13 @@ export const addStoryAction = async ({
 		})
 		.returning();
 
-	if (!result[0]) throw new Error("Story not found");
+	if (!storiesResult[0]) throw new Error("Story not found");
 
 	try {
 		const token = await getUserToken(roomId);
 		if (!token) throw new Error("Unauthorized");
 		await updateClients(token, "addStory", {
-			story: result[0],
+			story: storiesResult[0],
 		});
 	} catch (error) {
 		console.error("Error updating live data: (newStory)", error);
@@ -40,11 +54,25 @@ export const addStoryAction = async ({
 	}
 };
 
-export const completeStoryAction = async ({
-	storyId,
-}: {
-	storyId: Story["id"];
-}) => {
+const CompleteStoryInputSchema = z.object({
+	storyId: z
+		.string()
+		.trim()
+		.refine(async storyId => {
+			const story = await db.query.stories.findFirst({
+				where: (stories, { eq }) => eq(stories.id, storyId),
+			});
+			return !!story;
+		}, "Story not found"),
+});
+
+export const completeStoryAction = async (
+	data: z.infer<typeof CompleteStoryInputSchema>,
+) => {
+	const result = await CompleteStoryInputSchema.safeParseAsync(data);
+	if (!result.success) throw new Error(result.error.message);
+	const { storyId } = result.data;
+
 	const story = await db.query.stories.findFirst({
 		where: (stories, { eq }) => eq(stories.id, storyId),
 		with: { votes: true },
@@ -69,7 +97,23 @@ export const completeStoryAction = async ({
 	}
 };
 
-export const uncompleteStoryAction = async (storyId: Story["id"]) => {
+const UncompleteStoryInputSchema = z
+	.string()
+	.trim()
+	.refine(async storyId => {
+		const story = await db.query.stories.findFirst({
+			where: (stories, { eq }) => eq(stories.id, storyId),
+		});
+		return !!story;
+	}, "Story not found");
+
+export const uncompleteStoryAction = async (
+	data: z.infer<typeof UncompleteStoryInputSchema>,
+) => {
+	const result = await UncompleteStoryInputSchema.safeParseAsync(data);
+	if (!result.success) throw new Error(result.error.message);
+	const storyId = result.data;
+
 	const story = db.transaction(tx => {
 		const story = tx
 			.update(stories)
@@ -87,13 +131,26 @@ export const uncompleteStoryAction = async (storyId: Story["id"]) => {
 	await updateClients(token, "uncompleteStory", { storyId });
 };
 
-export const voteForStoryAction = async ({
-	storyId,
-	vote,
-}: {
-	storyId: Story["id"];
-	vote: number | null;
-}) => {
+const VoteForStoryInputSchema = z.object({
+	storyId: z
+		.string()
+		.trim()
+		.refine(async storyId => {
+			const story = await db.query.stories.findFirst({
+				where: (stories, { eq }) => eq(stories.id, storyId),
+			});
+			return !!story;
+		}, "Story not found"),
+	vote: z.number().nullable(),
+});
+
+export const voteForStoryAction = async (
+	data: z.infer<typeof VoteForStoryInputSchema>,
+) => {
+	const result = await VoteForStoryInputSchema.safeParseAsync(data);
+	if (!result.success) throw new Error(result.error.message);
+	const { vote, storyId } = result.data;
+
 	const story = await db.query.stories.findFirst({
 		where: (stories, { eq }) => eq(stories.id, storyId),
 		with: { votes: true },
@@ -131,7 +188,7 @@ export const voteForStoryAction = async ({
 		await updateClients(token, "userVoted", {
 			memberId: currentUser.id,
 			storyId,
-			vote,
+			// vote,
 		});
 	} catch (error) {
 		console.error("Error updating live data: (userVoted)", error);

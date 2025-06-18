@@ -163,5 +163,3 @@ const AddStorySchema = z.object({
 	title: z.string().min(1, "Story title is required"),
 	description: z.string(),
 });
-
-export type AddStoryData = z.infer<typeof AddStorySchema>;
