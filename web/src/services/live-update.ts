@@ -34,8 +34,13 @@ export const updateClients = async <TEvent extends keyof UpdaterData>(
 	);
 	if (result.ok) return null;
 
-	const response = await result.text();
-	return { error: `Error updating live data: ${response}` };
+	try {
+		const response = await result.text();
+		return { error: `Error updating live data: ${response}` };
+	} catch (error) {
+		if (error instanceof Error) return { error: error.message };
+		return { error: "Error updating live data" };
+	}
 };
 
 const updaterEndpoint = {
