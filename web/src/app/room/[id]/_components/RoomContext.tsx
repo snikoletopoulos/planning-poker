@@ -84,19 +84,20 @@ export const RoomProvider = ({
 		async (card: number | "?" | null) => {
 			if (!activeStory) return;
 			setSelectedCard(card);
-			await voteForStoryAction({
+			const result = await voteForStoryAction({
 				storyId: activeStory.id,
 				vote: card === "?" ? null : card,
 			});
+			if (result) toast.error(result.error);
 		},
 		[activeStory],
 	);
 
-	const completeStory = useCallback(
-		async () =>
-			activeStory && (await completeStoryAction({ storyId: activeStory.id })),
-		[activeStory],
-	);
+	const completeStory = useCallback(async () => {
+		if (!activeStory) return;
+		const result = await completeStoryAction({ storyId: activeStory.id });
+		if (result) toast.error(result.error);
+	}, [activeStory]);
 
 	const getWsUrl = useCallback(async () => {
 		const token = await getWsToken(authToken);

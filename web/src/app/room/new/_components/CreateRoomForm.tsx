@@ -11,6 +11,7 @@ import {
 	useForm,
 	useFormState,
 } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/Button";
@@ -49,7 +50,7 @@ export const CreateRoomForm = ({
 }: {
 	onSubmitAction: (
 		data: z.infer<typeof CreateRoomSchema>,
-	) => Promise<Room["id"]>;
+	) => Promise<Room["id"] | { error: string }>;
 }) => {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
@@ -71,8 +72,12 @@ export const CreateRoomForm = ({
 
 	const handleCreateRoom = handleSubmit(async data => {
 		try {
-			const roomId = await onSubmitAction(data);
-			router.push(`/room/${roomId}`);
+			const result = await onSubmitAction(data);
+			if (typeof result === "object") {
+				toast.error(result.error);
+				return;
+			}
+			router.push(`/room/${result}`);
 		} catch (error) {
 			console.error("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });

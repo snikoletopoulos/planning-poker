@@ -24,11 +24,18 @@ export const updateClients = async <TEvent extends keyof UpdaterData>(
 	event: TEvent,
 	data: UpdaterData[TEvent],
 ) => {
-	await fetch(`${process.env.UPDATER_INTERNAL_URL}${updaterEndpoint[event]}`, {
-		method: "POST",
-		headers: { Authorization: `Bearer ${token}` },
-		body: JSON.stringify(data),
-	});
+	const result = await fetch(
+		`${process.env.UPDATER_INTERNAL_URL}${updaterEndpoint[event]}`,
+		{
+			method: "POST",
+			headers: { Authorization: `Bearer ${token}` },
+			body: JSON.stringify(data),
+		},
+	);
+	if (result.ok) return null;
+
+	const response = await result.text();
+	return { error: `Error updating live data: ${response}` };
 };
 
 const updaterEndpoint = {

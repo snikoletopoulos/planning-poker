@@ -39,16 +39,17 @@ export const addStoryAction = async (
 			isCompleted: false,
 		})
 		.returning();
-
 	if (!storiesResult[0]) throw new Error("Story not found");
 
 	try {
 		const token = await getUserToken(roomId);
 		if (!token) throw new Error("Unauthorized");
-		await updateClients(token, "addStory", storiesResult[0]);
+		return await updateClients(token, "addStory", storiesResult[0]);
 	} catch (error) {
 		console.error("Error updating live data: (newStory)", error);
 		revalidatePath(`/room/${roomId}`);
+		if (error instanceof Error) return { error: error.message };
+		return { error: "Error updating live data" };
 	}
 };
 
@@ -88,10 +89,12 @@ export const completeStoryAction = async (
 	try {
 		const token = await getUserToken(story.roomId);
 		if (!token) throw new Error("Unauthorized");
-		await updateClients(token, "completeStory", { storyId });
+		return await updateClients(token, "completeStory", { storyId });
 	} catch (error) {
 		console.error("Error updating live data: (completeStory)", error);
 		revalidatePath(`/room/${story.roomId}`);
+		if (error instanceof Error) return { error: error.message };
+		return { error: "Error updating live data" };
 	}
 };
 
@@ -124,9 +127,16 @@ export const uncompleteStoryAction = async (
 		return story;
 	});
 
-	const token = await getUserToken(story.roomId);
-	if (!token) throw new Error("Unauthorized");
-	await updateClients(token, "uncompleteStory", { storyId });
+	try {
+		const token = await getUserToken(story.roomId);
+		if (!token) throw new Error("Unauthorized");
+		return await updateClients(token, "uncompleteStory", { storyId });
+	} catch (error) {
+		console.error("Error updating live data: (uncompleteStory)", error);
+		revalidatePath(`/room/${story.roomId}`);
+		if (error instanceof Error) return { error: error.message };
+		return { error: "Error updating live data" };
+	}
 };
 
 const VoteForStoryInputSchema = z.object({
@@ -183,7 +193,7 @@ export const voteForStoryAction = async (
 	try {
 		const token = await getUserToken(story.roomId);
 		if (!token) throw new Error("Unauthorized");
-		await updateClients(token, "userVoted", {
+		return await updateClients(token, "userVoted", {
 			memberId: currentUser.id,
 			storyId,
 			vote,
@@ -191,5 +201,7 @@ export const voteForStoryAction = async (
 	} catch (error) {
 		console.error("Error updating live data: (userVoted)", error);
 		revalidatePath(`/room/${story.roomId}`);
+		if (error instanceof Error) return { error: error.message };
+		return { error: "Error updating live data" };
 	}
 };

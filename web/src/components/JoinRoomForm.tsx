@@ -5,6 +5,7 @@ import { ArrowRight, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/Button";
@@ -25,7 +26,9 @@ export const JoinRoomForm = ({
 	roomName,
 	roomCode,
 }: {
-	onSubmitAction: (data: z.infer<typeof JoinRoomSchema>) => Promise<Room["id"]>;
+	onSubmitAction: (
+		data: z.infer<typeof JoinRoomSchema>,
+	) => Promise<Room["id"] | { error: string }>;
 	roomName?: string;
 	roomCode?: Room["id"];
 }) => {
@@ -46,8 +49,12 @@ export const JoinRoomForm = ({
 
 	const handleJoinRoom = handleSubmit(async data => {
 		try {
-			const roomId = await onSubmitAction(data);
-			router.push(`/room/${roomId}`);
+			const result = await onSubmitAction(data);
+			if (typeof result === "object") {
+				toast.error(result.error);
+				return;
+			}
+			router.push(`/room/${result}`);
 		} catch (error) {
 			console.error("[JOIN_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });

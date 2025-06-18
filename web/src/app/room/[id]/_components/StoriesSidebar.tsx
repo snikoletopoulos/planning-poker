@@ -104,13 +104,14 @@ const AddStory = ({ onComplete }: { onComplete: () => void }) => {
 
 	const handleAddStory = handleSubmit(async data => {
 		try {
-			await toast
+			const result = await toast
 				.promise(addStoryAction({ ...data, roomId: room.id }), {
 					loading: "Adding story...",
 					success: "Story added successfully",
 					error: "Error adding story",
 				})
 				.unwrap();
+			if (result) toast.error(result.error);
 			reset();
 			onComplete();
 		} catch (error) {

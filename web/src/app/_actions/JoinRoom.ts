@@ -39,13 +39,16 @@ export const joinRoomAction = async (
 	const { user, token: newToken } = await createNewUser(name, room.id);
 
 	try {
-		await updateClients(newToken, "membersJoined", {
+		const result = await updateClients(newToken, "membersJoined", {
 			roomId: roomCode,
 			member: user,
 		});
+		if (result) return result;
 	} catch (error) {
 		console.error("Error updating live data: (createNewUser)", error);
 		revalidatePath(`/room/${roomCode}`);
+		if (error instanceof Error) return { error: error.message };
+		return { error: "Error updating live data" };
 	}
 
 	return room.id;

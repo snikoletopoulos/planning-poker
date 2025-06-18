@@ -15,9 +15,7 @@ import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";
 import { rooms, stories as storiesTable, type NewStory } from "@/lib/db/schema";
 import { updateClients } from "@/services/live-update";
-import {
-	CreateRoomForm,
-} from "./_components/CreateRoomForm";
+import { CreateRoomForm } from "./_components/CreateRoomForm";
 
 export const metadata: Metadata = {
 	title: "Create room",
@@ -75,13 +73,16 @@ const NewRoomPage = () => {
 		const { user, token } = await createNewUser(name, roomId);
 
 		try {
-			await updateClients(token, "membersJoined", {
+			const result = await updateClients(token, "membersJoined", {
 				roomId,
 				member: user,
 			});
+			if (result) return result;
 		} catch (error) {
 			console.error("Error updating live data: (createNewUser)", error);
 			revalidatePath(`/room/${roomId}`);
+			if (error instanceof Error) return { error: error.message };
+			return { error: "Error updating live data" };
 		}
 
 		return roomId;
