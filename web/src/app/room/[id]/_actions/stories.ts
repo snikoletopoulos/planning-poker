@@ -45,9 +45,7 @@ export const addStoryAction = async (
 	try {
 		const token = await getUserToken(roomId);
 		if (!token) throw new Error("Unauthorized");
-		await updateClients(token, "addStory", {
-			story: storiesResult[0],
-		});
+		await updateClients(token, "addStory", storiesResult[0]);
 	} catch (error) {
 		console.error("Error updating live data: (newStory)", error);
 		revalidatePath(`/room/${roomId}`);
@@ -188,7 +186,7 @@ export const voteForStoryAction = async (
 		await updateClients(token, "userVoted", {
 			memberId: currentUser.id,
 			storyId,
-			// vote,
+			vote,
 		});
 	} catch (error) {
 		console.error("Error updating live data: (userVoted)", error);

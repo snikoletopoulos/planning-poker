@@ -6,9 +6,7 @@ interface UpdaterData {
 		storyId: Story["id"];
 		vote: number | null;
 	};
-	addStory: {
-		story: Story;
-	};
+	addStory: Story;
 	completeStory: {
 		storyId: Story["id"];
 	};
