@@ -3,7 +3,6 @@
 import { useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import {
 	createFormControl,
 	FormProvider,
@@ -19,7 +18,6 @@ import { CardContent, CardFooter } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
-import type { Room } from "@/lib/db/schema";
 import { PasteFromClipboardButton } from "./PasteFromClipboardButton";
 
 const CreateRoomSchema = z.object({
@@ -50,9 +48,8 @@ export const CreateRoomForm = ({
 }: {
 	onSubmitAction: (
 		data: z.infer<typeof CreateRoomSchema>,
-	) => Promise<Room["id"] | { error: string }>;
+	) => Promise<{ error: string }>;
 }) => {
-	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 
 	const form = useForm({ formControl });
@@ -73,11 +70,7 @@ export const CreateRoomForm = ({
 	const handleCreateRoom = handleSubmit(async data => {
 		try {
 			const result = await onSubmitAction(data);
-			if (typeof result === "object") {
-				toast.error(result.error);
-				return;
-			}
-			router.push(`/room/${result}`);
+			toast.error(result.error);
 		} catch (error) {
 			console.error("[CREATE_ROOM:SUBMIT]", error);
 			setError("root", { message: "Internal server error" });

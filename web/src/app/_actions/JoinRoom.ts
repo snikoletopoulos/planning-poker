@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { createNewUser } from "@/helpers/user";
@@ -33,7 +34,7 @@ export const joinRoomAction = async (
 	if (token) {
 		const user = room.members.find(member => member.accessToken === token);
 		if (!user) throw new Error("User not found");
-		return room.id;
+		redirect(`/room/${room.id}`);
 	}
 
 	const { user, token: newToken } = await createNewUser(name, room.id);
@@ -51,5 +52,5 @@ export const joinRoomAction = async (
 		return { error: "Error updating live data" };
 	}
 
-	return room.id;
+	redirect(`/room/${room.id}`);
 };

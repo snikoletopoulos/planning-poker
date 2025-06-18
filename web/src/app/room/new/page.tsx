@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/Button";
@@ -85,7 +86,7 @@ const NewRoomPage = () => {
 			return { error: "Error updating live data" };
 		}
 
-		return roomId;
+		redirect(`/room/${roomId}`);
 	};
 
 	return (
