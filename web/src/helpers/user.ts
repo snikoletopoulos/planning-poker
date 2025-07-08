@@ -1,5 +1,5 @@
-import { createId } from "@paralleldrive/cuid2";
 import { cookies } from "next/headers";
+import { v4 as uuid } from "uuid";
 
 import { db } from "@/lib/db";
 import { members, type Room } from "@/lib/db/schema";
@@ -22,7 +22,7 @@ export const createNewUser = async (
 	roomId: Room["id"],
 	tx: Transaction = db,
 ) => {
-	const userId = createId();
+	const userId = uuid();
 	const newToken = createToken({ id: userId, name, roomId });
 
 	const user = (

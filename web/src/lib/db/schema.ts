@@ -1,15 +1,15 @@
-import { createId } from "@paralleldrive/cuid2";
 import {
 	relations,
 	type InferInsertModel,
 	type InferSelectModel,
 } from "drizzle-orm";
 import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { v4 as uuid } from "uuid";
 
 export const rooms = sqliteTable("rooms", {
 	id: text()
 		.primaryKey()
-		.$defaultFn(() => createId()),
+		.$defaultFn(() => uuid()),
 	name: text().notNull(),
 	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
 	isActive: int("is_active", { mode: "boolean" }).default(true),
@@ -26,7 +26,7 @@ export const roomRelations = relations(rooms, ({ many }) => ({
 export const stories = sqliteTable("stories", {
 	id: text()
 		.primaryKey()
-		.$defaultFn(() => createId()),
+		.$defaultFn(() => uuid()),
 	title: text().notNull(),
 	description: text(),
 	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
@@ -50,7 +50,7 @@ export const storyRelations = relations(stories, ({ many, one }) => ({
 export const members = sqliteTable("members", {
 	id: text()
 		.primaryKey()
-		.$defaultFn(() => createId()),
+		.$defaultFn(() => uuid()),
 	name: text().notNull(),
 	roomId: text("room_id")
 		.notNull()
