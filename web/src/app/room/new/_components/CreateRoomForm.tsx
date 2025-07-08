@@ -56,7 +56,6 @@ export const CreateRoomForm = ({
 	const {
 		formState: { isValid, isSubmitting, errors },
 	} = form;
-	console.log("🪚 errors:", errors);
 
 	const {
 		fields: stories,
