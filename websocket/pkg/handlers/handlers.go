@@ -65,11 +65,12 @@ func WebSocketUpgrade(w http.ResponseWriter, r *http.Request) {
 
 func UserVoted(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		MemberID string `json:"memberId" validate:"required"`
-		StoryID  string `json:"storyId" validate:"required"`
+		MemberID string `json:"memberId" validate:"required,uuid"`
+		StoryID  string `json:"storyId" validate:"required,uuid"`
 		Vote     *int   `json:"vote" validate:"gte=0,lte=89"` // TODO: make nil pass validation
 	}
 	err := json.NewDecoder(r.Body).Decode(&body)
+	fmt.Println("🪚 body:", body.MemberID)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Invalid request body"))
@@ -120,12 +121,12 @@ func UserVoted(w http.ResponseWriter, r *http.Request) {
 }
 
 type Story struct {
-	ID          string  `json:"id" validate:"required"`
+	ID          string  `json:"id" validate:"required,uuid"`
 	Title       string  `json:"title" validate:"required,min=1"`
 	Description *string `json:"description" validate:"required"`
 	IsCompleted *bool   `json:"isCompleted" validate:"required"`
-	RoomID      string  `json:"roomId" validate:"required"`
-	CreatedAt   string  `json:"createdAt" validate:"required,datetime"` // TODO: datetime
+	RoomID      string  `json:"roomId" validate:"required,uuid"`
+	CreatedAt   string  `json:"createdAt" validate:"required"`
 }
 
 func NewStory(w http.ResponseWriter, r *http.Request) {
@@ -155,7 +156,7 @@ func NewStory(w http.ResponseWriter, r *http.Request) {
 
 func RevealStory(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		StoryID string `json:"storyId"`
+		StoryID string `json:"storyId" validate:"required,uuid"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -198,7 +199,7 @@ func RevealStory(w http.ResponseWriter, r *http.Request) {
 
 func UnrevealStory(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		StoryID string `json:"storyId" validate:"required"`
+		StoryID string `json:"storyId" validate:"required,uuid"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -231,13 +232,13 @@ func UnrevealStory(w http.ResponseWriter, r *http.Request) {
 }
 
 type Member struct {
-	ID   string `json:"id" validate:"required"`
+	ID   string `json:"id" validate:"required,uuid"`
 	Name string `json:"name" validate:"required,min=1"`
 }
 
 func MemberJoined(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		RoomID string `json:"roomId" validate:"required"`
+		RoomID string `json:"roomId" validate:"required,uuid"`
 		Member Member `json:"member" validate:"required"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&body)
