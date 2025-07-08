@@ -38,9 +38,7 @@ const NewRoomPage = () => {
 		"use server";
 
 		const result = CreateRoomInputSchema.safeParse(data);
-		if (!result.success) {
-			throw new Error(result.error.message);
-		}
+		if (!result.success) return { error: result.error.message };
 		const { name, roomName, stories } = result.data;
 
 		const { roomId } = db.transaction(tx => {

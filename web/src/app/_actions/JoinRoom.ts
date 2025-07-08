@@ -18,22 +18,20 @@ export const joinRoomAction = async (
 	data: z.infer<typeof JoinRoomInputSchema>,
 ) => {
 	const result = JoinRoomInputSchema.safeParse(data);
-	if (!result.success) {
-		throw new Error(result.error.message);
-	}
+	if (!result.success) return { error: result.error.message };
 	const { name, roomCode } = result.data;
 
 	const room = await db.query.rooms.findFirst({
 		where: (rooms, { eq }) => eq(rooms.id, roomCode),
 		with: { members: true },
 	});
-	if (!room) throw new Error("Room not found");
+	if (!room) return { error: "Room not found" };
 
 	const cookieStore = await cookies();
 	const token = cookieStore.get(room.id)?.value;
 	if (token) {
 		const user = room.members.find(member => member.accessToken === token);
-		if (!user) throw new Error("User not found");
+		if (!user) return { error: "User not found" };
 		redirect(`/room/${room.id}`);
 	}
 

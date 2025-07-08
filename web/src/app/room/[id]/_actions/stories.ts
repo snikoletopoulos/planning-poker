@@ -27,7 +27,7 @@ export const addStoryAction = async (
 	data: z.infer<typeof AddStoryInputSchema>,
 ) => {
 	const result = await AddStoryInputSchema.safeParseAsync(data);
-	if (!result.success) throw new Error(result.error.message);
+	if (!result.success) return { error: result.error.message };
 	const { roomId, title, description } = result.data;
 
 	const storiesResult = await db
@@ -39,11 +39,11 @@ export const addStoryAction = async (
 			isCompleted: false,
 		})
 		.returning();
-	if (!storiesResult[0]) throw new Error("Story not found");
+	if (!storiesResult[0]) return { error: "Story not found" };
 
 	try {
 		const token = await getUserToken(roomId);
-		if (!token) throw new Error("Unauthorized");
+		if (!token) return { error: "Unauthorized" };
 		return await updateClients(token, "addStory", storiesResult[0]);
 	} catch (error) {
 		console.error("Error updating live data: (newStory)", error);
@@ -69,7 +69,7 @@ export const completeStoryAction = async (
 	data: z.infer<typeof CompleteStoryInputSchema>,
 ) => {
 	const result = await CompleteStoryInputSchema.safeParseAsync(data);
-	if (!result.success) throw new Error(result.error.message);
+	if (!result.success) return { error: result.error.message };
 	const { storyId } = result.data;
 
 	const story = await db.query.stories.findFirst({
@@ -77,9 +77,9 @@ export const completeStoryAction = async (
 		with: { votes: true },
 	});
 
-	if (!story) throw new Error("Story not found");
+	if (!story) return { error: "Story not found" };
 	if (story.votes.length === 0)
-		throw new Error("A Story needs votes to be completed");
+		return { error: "A Story needs votes to be completed" };
 
 	await db
 		.update(stories)
@@ -88,7 +88,7 @@ export const completeStoryAction = async (
 
 	try {
 		const token = await getUserToken(story.roomId);
-		if (!token) throw new Error("Unauthorized");
+		if (!token) return { error: "Unauthorized" };
 		return await updateClients(token, "completeStory", { storyId });
 	} catch (error) {
 		console.error("Error updating live data: (completeStory)", error);
@@ -112,7 +112,7 @@ export const uncompleteStoryAction = async (
 	data: z.infer<typeof UncompleteStoryInputSchema>,
 ) => {
 	const result = await UncompleteStoryInputSchema.safeParseAsync(data);
-	if (!result.success) throw new Error(result.error.message);
+	if (!result.success) return { error: result.error.message };
 	const storyId = result.data;
 
 	const story = db.transaction(tx => {
@@ -129,7 +129,7 @@ export const uncompleteStoryAction = async (
 
 	try {
 		const token = await getUserToken(story.roomId);
-		if (!token) throw new Error("Unauthorized");
+		if (!token) return { error: "Unauthorized" };
 		return await updateClients(token, "uncompleteStory", { storyId });
 	} catch (error) {
 		console.error("Error updating live data: (uncompleteStory)", error);
@@ -156,7 +156,7 @@ export const voteForStoryAction = async (
 	data: z.infer<typeof VoteForStoryInputSchema>,
 ) => {
 	const result = await VoteForStoryInputSchema.safeParseAsync(data);
-	if (!result.success) throw new Error(result.error.message);
+	if (!result.success) return { error: result.error.message };
 	const { vote, storyId } = result.data;
 
 	const story = await db.query.stories.findFirst({
@@ -164,10 +164,10 @@ export const voteForStoryAction = async (
 		with: { votes: true },
 	});
 
-	if (!story) throw new Error("Story not found");
-	if (story.isCompleted) throw new Error("Story is already completed");
+	if (!story) return { error: "Story not found" };
+	if (story.isCompleted) return { error: "Story is already completed" };
 	const currentUser = await getCurrentUser(story.roomId);
-	if (!currentUser) throw new Error("Unauthorized");
+	if (!currentUser) return { error: "Unauthorized" };
 
 	const existingVote = story.votes.find(
 		vote => vote.memberId === currentUser.id,
@@ -192,7 +192,7 @@ export const voteForStoryAction = async (
 
 	try {
 		const token = await getUserToken(story.roomId);
-		if (!token) throw new Error("Unauthorized");
+		if (!token) return { error: "Unauthorized" };
 		return await updateClients(token, "userVoted", {
 			memberId: currentUser.id,
 			storyId,
