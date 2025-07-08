@@ -12,7 +12,6 @@ export const rooms = sqliteTable("rooms", {
 		.$defaultFn(() => uuid()),
 	name: text().notNull(),
 	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
-	isActive: int("is_active", { mode: "boolean" }).default(true),
 });
 
 export type Room = InferSelectModel<typeof rooms>;

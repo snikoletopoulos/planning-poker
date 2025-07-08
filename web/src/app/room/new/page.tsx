@@ -46,11 +46,7 @@ const NewRoomPage = () => {
 		const { roomId } = db.transaction(tx => {
 			const roomsResult = tx
 				.insert(rooms)
-				.values({
-					name: roomName,
-					isActive: true,
-					createdAt: new Date(),
-				})
+				.values({ name: roomName })
 				.returning()
 				.get();
 
