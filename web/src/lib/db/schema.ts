@@ -33,7 +33,7 @@ export const stories = sqliteTable("stories", {
 	isCompleted: int("is_completed", { mode: "boolean" }).default(false),
 	roomId: text("room_id")
 		.notNull()
-		.references(() => rooms.id),
+		.references(() => rooms.id, { onDelete: "cascade" }),
 });
 
 export type Story = InferSelectModel<typeof stories>;
@@ -54,7 +54,7 @@ export const members = sqliteTable("members", {
 	name: text().notNull(),
 	roomId: text("room_id")
 		.notNull()
-		.references(() => rooms.id),
+		.references(() => rooms.id, { onDelete: "cascade" }),
 	accessToken: text("access_token").notNull(),
 	createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
 });
@@ -75,10 +75,10 @@ export const votes = sqliteTable(
 	{
 		memberId: text("member_id")
 			.notNull()
-			.references(() => members.id),
+			.references(() => members.id, { onDelete: "cascade" }),
 		storyId: text("story_id")
 			.notNull()
-			.references(() => stories.id),
+			.references(() => stories.id, { onDelete: "cascade" }),
 		vote: int(),
 		createdAt: int("created_at", { mode: "timestamp" }).notNull().defaultNow(),
 	},
