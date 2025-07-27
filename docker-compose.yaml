@@ -1,0 +1,28 @@
+name: planning-poker
+
+services:
+  web:
+    build:
+      context: web
+      args:
+        DB_FILE_NAME: $DB_FILE_NAME
+        APP_URL: $APP_URL
+        AUTH_SECRET: $AUTH_SECRET
+        UPDATER_INTERNAL_URL: $UPDATER_INTERNAL_URL
+        NEXT_PUBLIC_UPDATER_WS_URL: $NEXT_PUBLIC_UPDATER_WS_URL
+        NEXT_PUBLIC_UPDATER_HTTP_URL: $NEXT_PUBLIC_UPDATER_HTTP_URL
+    env_file: .env
+    volumes:
+      - ./db:/app/db
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+
+  websocket:
+    build: websocket
+    env_file: .env
+    volumes:
+      - ./db:/app/db
+    ports:
+      - 3001:3001
+    restart: unless-stopped
