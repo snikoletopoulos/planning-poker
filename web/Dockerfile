@@ -37,6 +37,8 @@ ENV NEXT_PUBLIC_UPDATER_HTTP_URL=$NEXT_PUBLIC_UPDATER_HTTP_URL
 
 RUN pnpm build
 
+RUN pnpm db:migrate
+
 FROM base AS runner
 
 RUN addgroup --system --gid 1001 nodejs
