@@ -13,35 +13,23 @@ services:
         NEXT_PUBLIC_UPDATER_HTTP_URL: $NEXT_PUBLIC_UPDATER_HTTP_URL
     env_file: .env
     volumes:
-      - ./db:/app/db
+      - ../files/poker-db:/app/db
     ports:
       - 3000
     restart: unless-stopped
     networks:
       - dokploy-network
-    labels:
-      - "traefik.enable=true"
-      # - "traefik.http.routers.websockets.rule=Host(`your-domain.com`)"
-      # - "traefik.http.routers.<unique-name>.entrypoints=websecure"
-      - "traefik.http.routers.web.tls.certResolver=letsencrypt"
-      - "traefik.http.services.web.loadbalancer.server.port=3002"
 
   websocket:
     build: websocket
     env_file: .env
     volumes:
-      - ./db:/app/db
+      - ..files/poker-db:/app/db
     ports:
       - 3001
     restart: unless-stopped
     networks:
       - dokploy-network
-    labels:
-      - "traefik.enable=true"
-      # - "traefik.http.routers.websockets.rule=Host(`your-domain.com`)"
-      # - "traefik.http.routers.<unique-name>.entrypoints=websecure"
-      - "traefik.http.routers.websocket.tls.certResolver=letsencrypt"
-      - "traefik.http.services.websocket.loadbalancer.server.port=3001"
 
 networks:
   dokploy-network:
