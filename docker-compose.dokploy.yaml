@@ -18,6 +18,12 @@ services:
     restart: unless-stopped
     networks:
       - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.http.routers.websockets.rule=Host(`your-domain.com`)"
+      # - "traefik.http.routers.<unique-name>.entrypoints=websecure"
+      - "traefik.http.routers.web.tls.certResolver=letsencrypt"
+      - "traefik.http.services.web.loadbalancer.server.port=3000"
 
   websocket:
     build: websocket
@@ -28,6 +34,12 @@ services:
     restart: unless-stopped
     networks:
       - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.http.routers.websockets.rule=Host(`your-domain.com`)"
+      # - "traefik.http.routers.<unique-name>.entrypoints=websecure"
+      - "traefik.http.routers.websocket.tls.certResolver=letsencrypt"
+      - "traefik.http.services.websocket.loadbalancer.server.port=3001"
 
 networks:
   dokploy-network:
