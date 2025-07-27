@@ -14,7 +14,7 @@ services:
     volumes:
       - ./db:/app/db
     ports:
-      - 3000:3000
+      - 3000:3002
     restart: unless-stopped
     networks:
       - dokploy-network
@@ -23,7 +23,7 @@ services:
       # - "traefik.http.routers.websockets.rule=Host(`your-domain.com`)"
       # - "traefik.http.routers.<unique-name>.entrypoints=websecure"
       - "traefik.http.routers.web.tls.certResolver=letsencrypt"
-      - "traefik.http.services.web.loadbalancer.server.port=3000"
+      - "traefik.http.services.web.loadbalancer.server.port=3002"
 
   websocket:
     build: websocket
