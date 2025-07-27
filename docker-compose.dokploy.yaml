@@ -15,7 +15,7 @@ services:
     volumes:
       - ./db:/app/db
     ports:
-      - 3002:3000
+      - 3000
     restart: unless-stopped
     networks:
       - dokploy-network
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./db:/app/db
     ports:
-      - 3001:3001
+      - 3001
     restart: unless-stopped
     networks:
       - dokploy-network
