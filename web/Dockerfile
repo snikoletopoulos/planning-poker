@@ -39,7 +39,7 @@ ENV NEXT_PUBLIC_UPDATER_HTTP_URL=$NEXT_PUBLIC_UPDATER_HTTP_URL
 
 RUN pnpm build
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "dev"]
 
 # FROM base AS runner
 #
