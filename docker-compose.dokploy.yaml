@@ -11,6 +11,7 @@ services:
         UPDATER_INTERNAL_URL: $UPDATER_INTERNAL_URL
         NEXT_PUBLIC_UPDATER_WS_URL: $NEXT_PUBLIC_UPDATER_WS_URL
         NEXT_PUBLIC_UPDATER_HTTP_URL: $NEXT_PUBLIC_UPDATER_HTTP_URL
+    env_file: .env
     volumes:
       - ./db:/app/db
     ports:
@@ -27,6 +28,7 @@ services:
 
   websocket:
     build: websocket
+    env_file: .env
     volumes:
       - ./db:/app/db
     ports:
