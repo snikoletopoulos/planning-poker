@@ -1,46 +1,48 @@
-import { FlatCompat } from "@eslint/eslintrc";
 import eslint from "@eslint/js";
+import json from "@eslint/json";
+import nextPlugin from "@next/eslint-plugin-next";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 import prettier from "eslint-config-prettier";
+import tailwindPlugin from "eslint-plugin-better-tailwindcss";
 import importPlugin from "eslint-plugin-import";
-import json from "eslint-plugin-json";
+import importZod from "eslint-plugin-import-zod";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
 import react from "eslint-plugin-react";
-import reactCompiler from "eslint-plugin-react-compiler";
 import reactHooks from "eslint-plugin-react-hooks";
-// import tailwind from "eslint-plugin-tailwindcss";
+import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-const compat = new FlatCompat({
-	baseDirectory: import.meta.dirname,
-});
+// const compat = new FlatComptseslint.confitseslint.configgat({
+// 	baseDirectory: import.meta.dirname,
+// });
 
-export default tseslint.config(
-	{ ignores: ["src/lib/db/migrations/*"] },
+export default defineConfig(
+	globalIgnores(["src/lib/db/migrations/*", ".next/**", "next-env.d.ts"]),
 	{
 		name: "Main options",
 		languageOptions: {
 			ecmaVersion: 2022,
 			sourceType: "module",
-			globals: globals.node,
 		},
-		linterOptions: { reportUnusedDisableDirectives: false },
+		linterOptions: { reportUnusedDisableDirectives: true },
 	},
 	{ name: "ESlint recommended rules", ...eslint.configs.recommended },
 	{
 		name: "ESlint rules",
-		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
 		rules: {
 			/* Enforce camelCase */
-			camelcase: "error",
+			camelcase: ["error", { allow: ["required_error"] }],
 			/* We allow console for debug and error reporting */
-			"no-console": "off",
+			"no-console": "error",
 			/* Allow void for async functions */
 			"no-void": ["error", { allowAsStatement: true }],
 			/* Disabled this rule since it doesn't allow re-exporting default from index files */
 			"no-restricted-exports": "off",
 			/* Restrict function syntax */
 			"func-style": ["error", "declaration", { allowArrowFunctions: true }],
+			/* Make sure that errors are always re-referenced */
+			"preserve-caught-error": "error",
 			/* Restrict function syntax in objects */
 			"object-shorthand": "error",
 			/* Restrict callbacks to arrow functions */
@@ -54,21 +56,10 @@ export default tseslint.config(
 	{
 		name: "Import",
 		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
-		plugins: { import: importPlugin },
+		extends: [importPlugin.flatConfigs.recommended],
 		rules: {
-			...importPlugin.configs.recommended.rules,
-			/* Duplicate from typescript */
-			"import/named": "off",
-			/* Duplicate from typescript */
-			"import/namespace": "off",
-			/* Duplicate from typescript */
-			"import/default": "off",
-			/* Duplicate from typescript */
-			"import/no-named-as-default-member": "off",
-			/* Duplicate from typescript */
-			"import/no-unresolved": "off",
-			/* Prevent cyclic imports */
-			"import/no-cycle": "error",
+			/* TODO: Prevent cyclic imports */
+			// "import/no-cycle": "error",
 			/* Allow default export of anonymous objects */
 			"import/no-anonymous-default-export": [
 				"error",
@@ -79,49 +70,73 @@ export default tseslint.config(
 		},
 	},
 	{
-		name: "JSON",
-		files: ["**/*.{json,jsonc}"],
+		files: ["**/*.json"],
+		language: "json/json",
 		plugins: { json },
-		rules: json.configs["recommended"].rules,
+		extends: ["json/recommended"],
+		rules: { "no-irregular-whitespace": "off" },
 	},
+	{
+		files: ["**/*.jsonc", ".vscode/*.json"],
+		language: "json/jsonc",
+		plugins: { json },
+		extends: ["json/recommended"],
+		rules: { "no-irregular-whitespace": "off" },
+	},
+	{ name: "Zod", extends: importZod.configs.recommended },
 	{
 		name: "Parser options for Typescript",
 		languageOptions: {
 			parserOptions: {
-				parser: tseslint.parser,
-				project: "tsconfig.json",
-				tsconfigRootDir: import.meta.dirname,
+				projectService: {
+					loadTypeScriptPlugins: true,
+					allowDefaultProject: ["lint-staged.config.ts", "prisma.config.ts"],
+				},
 			},
 		},
 	},
-
-	tseslint.configs.recommendedTypeChecked,
 	{
 		name: "Typescript ESlint rules",
 		files: ["**/*.{ts,tsx,mts,cts}"],
+		extends: [tseslint.configs.strictTypeChecked],
 		rules: {
 			/* Allow hoisting for functions for better code readability */
 			"@typescript-eslint/no-use-before-define": "off",
+			/* This rule is too restrictive */
+			"@typescript-eslint/return-await": "off",
 			/* There are several cases that we need to use a promise as a callback */
 			"@typescript-eslint/no-misused-promises": [
 				"error",
 				{
 					checksVoidReturn: {
 						attributes: false,
+						arguments: false,
+						properties: false,
 					},
 				},
 			],
-			/* This rule is too restrictive */
-			"@typescript-eslint/return-await": "off",
+			/* Allow classes as function groups */
+			"@typescript-eslint/no-extraneous-class": "off",
+			/* Allows arrow function shorthand */
+			"@typescript-eslint/no-confusing-void-expression": "off",
 			/* Disable unused-vars error when need to omit a field from object, { omittedField, ...params } = obj */
 			"@typescript-eslint/no-unused-vars": [
 				"error",
-				{
-					ignoreRestSiblings: true,
-				},
+				{ ignoreRestSiblings: true },
 			],
 			/* Require only objects to convert to string */
-			"@typescript-eslint/restrict-template-expressions": "error",
+			"@typescript-eslint/restrict-template-expressions": [
+				"error",
+				{
+					allow: [{ name: ["Error", "URL", "URLSearchParams"], from: "lib" }],
+					allowAny: false,
+					allowBoolean: false,
+					allowNever: false,
+					allowNullish: false,
+					allowNumber: true,
+					allowRegExp: false,
+				},
+			],
 			/* Allow leading underscore for apollo gql __typename and lodash - already is allowed */
 			"@typescript-eslint/naming-convention": [
 				"error",
@@ -133,31 +148,51 @@ export default tseslint.config(
 			],
 			/* Prevent checking wrong entry of an object */
 			"@typescript-eslint/no-unnecessary-condition": "warn",
-			/* Allow using namespaces */
-			"@typescript-eslint/no-namespace": "off",
-		},
-	},
-	{
-		name: "Typescript ESlint rules (ignore .d.ts)",
-		ignores: ["**/*.d.ts"],
-		rules: {
-			/* Restrict declaring types only as types (interfaces error) */
+			/* Require imports are needed in React Native */
+			"@typescript-eslint/no-require-imports": "off",
+			/* Restrict declaring types only as interfaces (types error) */
 			"@typescript-eslint/consistent-type-definitions": ["error", "interface"],
 		},
 	},
-
 	{
-		name: "Import",
+		name: "Import Typescript",
 		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
-		plugins: { import: importPlugin },
-		rules: importPlugin.configs.typescript.rules,
+		extends: [importPlugin.flatConfigs.typescript],
+		rules: {
+			/* Duplicate from typescript */
+			"import/named": "off",
+			/* Duplicate from typescript */
+			"import/namespace": "off",
+			/* Duplicate from typescript */
+			"import/default": "off",
+			/* Duplicate from typescript */
+			"import/no-named-as-default-member": "off",
+			/* Duplicate from typescript */
+			"import/no-unresolved": "off",
+		},
+	},
+	{
+		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
+		extends: [jsxA11yPlugin.flatConfigs["recommended"]],
+		rules: { "jsx-a11y/lang": "warn" },
+	},
+	{
+		name: "Tailwind",
+		plugins: { "better-tailwindcss": tailwindPlugin },
+		rules: {
+			...tailwindPlugin.configs.recommended.rules,
+			"better-tailwindcss/enforce-consistent-line-wrapping": "off",
+		},
 		settings: {
-			...importPlugin.configs.typescript.settings,
-			"import/resolver": {
-				...importPlugin.configs.typescript.settings["import/resolver"],
-				typescript: { project: "tsconfig.json" },
+			"better-tailwindcss": {
+				entryPoint: "./src/styles/globals.css",
 			},
 		},
+	},
+	{
+		name: "Import React",
+		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
+		extends: [importPlugin.flatConfigs.react],
 	},
 	{
 		name: "React",
@@ -188,6 +223,13 @@ export default tseslint.config(
 			"react/hook-use-state": ["warn", { allowDestructuredState: true }],
 			/* Make components with no children a self-closing tag */
 			"react/self-closing-comp": "warn",
+			/* Prevent fragments as component syntax */
+			"react/jsx-fragments": "error",
+			/* Handle curly braces in JSX */
+			"react/jsx-curly-brace-presence": [
+				"warn",
+				{ props: "never", children: "never", propElementValues: "always" },
+			],
 		},
 		languageOptions: {
 			parserOptions: {
@@ -205,26 +247,10 @@ export default tseslint.config(
 	{
 		name: "React hooks",
 		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
-		plugins: { "react-hooks": reactHooks },
-		rules: reactHooks.configs.recommended.rules,
+		extends: [reactHooks.configs.flat.recommended],
 	},
-	{ name: "React Compiler", ...reactCompiler.configs.recommended },
-	{
-		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
-		plugins: { "jsx-a11y": jsxA11yPlugin },
-		rules: {
-			"jsx-a11y/lang": "warn",
-		},
-	},
-	// {
-	// 	name: "Tailwind",
-	// 	settings: {
-	// 		tailwindcss: {
-	// 			callees: ["classnames", "clsx", "ctl", "cn"],
-	// 		},
-	// 	},
-	// },
-	// tailwind.configs["flat/recommended"],
-	...compat.extends("next/core-web-vitals"),
+	pluginQuery.configs["flat/recommended"],
+
+	nextPlugin.configs["core-web-vitals"],
 	{ name: "Prettier", ...prettier },
 );
