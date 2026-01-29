@@ -21,13 +21,13 @@ export const VoteCard = () => {
 			<CardContent className="p-6">
 				<div className="mb-4">
 					<h2 className="text-xl font-semibold">{activeStory.title}</h2>
-					<p className="text-muted-foreground mt-1">
+					<p className="mt-1 text-muted-foreground">
 						{activeStory.description}
 					</p>
 				</div>
 
 				<div className="mt-6">
-					<h3 className="text-muted-foreground mb-3 text-sm font-medium">
+					<h3 className="mb-3 text-sm font-medium text-muted-foreground">
 						Select your estimate:
 					</h3>
 
@@ -38,9 +38,9 @@ export const VoteCard = () => {
 								onClick={() => selectCard(value)}
 								disabled={!!showVotes}
 								className={cn(
-									"border-border flex aspect-[2/3] h-28 items-center justify-center rounded-lg border-2 text-lg font-bold transition-all",
+									"flex aspect-2/3 h-28 items-center justify-center rounded-lg border-2 border-border text-lg font-bold transition-all",
 									{
-										"border-primary bg-primary/10 text-primary -translate-y-1 transform shadow-md":
+										"-translate-y-1 transform border-primary bg-primary/10 text-primary shadow-md":
 											selectedCard === value,
 										"hover:border-primary/50 hover:bg-muted":
 											!activeStory.isCompleted && selectedCard !== value,
@@ -70,12 +70,12 @@ export const VoteCard = () => {
 						>
 							{showVotes ? (
 								<>
-									<EyeOff className="h-5 w-5" />
+									<EyeOff className="size-5" />
 									Revealed
 								</>
 							) : (
 								<>
-									<Eye className="h-5 w-5" />
+									<Eye className="size-5" />
 									Reveal Cards
 								</>
 							)}
@@ -88,7 +88,7 @@ export const VoteCard = () => {
 						disabled={!activeStory.isCompleted}
 					>
 						Next story
-						<ArrowRightIcon className="ml-2 h-5 w-5" />
+						<ArrowRightIcon className="ml-2 size-5" />
 					</Button>
 				</div>
 
@@ -139,17 +139,17 @@ const Summary = () => {
 	};
 
 	return (
-		<div className="bg-muted border-border mt-8 rounded-lg border p-4">
+		<div className="mt-8 rounded-lg border border-border bg-muted p-4">
 			<h3 className="mb-4 text-center font-medium">Results</h3>
 
 			<div className="flex items-center justify-center space-x-4">
 				<div className="text-center">
-					<p className="text-muted-foreground text-sm">Average</p>
+					<p className="text-sm text-muted-foreground">Average</p>
 					<p className="text-2xl font-bold">{calculateAverage()}</p>
 				</div>
 
 				<div className="text-center">
-					<p className="text-muted-foreground text-sm">Consensus</p>
+					<p className="text-sm text-muted-foreground">Consensus</p>
 					<p className="text-2xl font-bold">{calculateDifference()}</p>
 				</div>
 			</div>

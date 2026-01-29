@@ -64,7 +64,7 @@ const StoryList = () => {
 							className={cn(
 								"flex w-full cursor-pointer items-center justify-between rounded-md p-3",
 								{
-									"bg-primary text-primary-foreground border-border border":
+									"border border-border bg-primary text-primary-foreground":
 										activeStory.id === story.id,
 									"hover:bg-muted": activeStory.id !== story.id,
 									"bg-muted": !activeStory.isCompleted && story.isCompleted,
@@ -75,7 +75,7 @@ const StoryList = () => {
 							<div>
 								<h4 className="font-medium">{story.title}</h4>
 
-								<p className="text-muted-foreground truncate text-sm">
+								<p className="truncate text-sm text-muted-foreground">
 									{story.description}
 								</p>
 							</div>
@@ -151,7 +151,7 @@ const AddStory = ({ onComplete }: { onComplete: () => void }) => {
 					</div>
 
 					<Button className="w-full" disabled={!isValid || isSubmitting}>
-						<Plus className="mr-2 h-4 w-4" />
+						<Plus className="mr-2 size-4" />
 						Add Story
 					</Button>
 				</form>

@@ -96,7 +96,7 @@ export const JoinRoomForm = ({
 					<Button variant="outline" asChild>
 						<Link href="/room/new">
 							Create Room
-							<ArrowRight className="ml-2 h-4 w-4" />
+							<ArrowRight className="ml-2 size-4" />
 						</Link>
 					</Button>
 				)}
@@ -107,7 +107,7 @@ export const JoinRoomForm = ({
 					disabled={!isValid || isSubmitting}
 				>
 					Join Room
-					<Users className="ml-2 h-4 w-4" />
+					<Users className="ml-2 size-4" />
 				</Button>
 			</CardFooter>
 		</Card>

@@ -175,7 +175,7 @@ export const StoryInput = ({
 	const { errors } = useFormState({ control });
 
 	return (
-		<div className="bg-muted rounded-md border p-4">
+		<div className="rounded-md border bg-muted p-4">
 			<div className="mb-2 flex items-center justify-between">
 				<h4 className="font-medium">Story {index + 1}</h4>
 
@@ -184,7 +184,7 @@ export const StoryInput = ({
 						variant="ghost"
 						size="sm"
 						onClick={onRemove}
-						className="text-muted-foreground h-8 hover:text-red-500"
+						className="h-8 text-muted-foreground hover:text-red-500"
 					>
 						Remove
 					</Button>

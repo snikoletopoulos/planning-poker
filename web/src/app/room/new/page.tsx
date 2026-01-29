@@ -84,10 +84,10 @@ const NewRoomPage = () => {
 	};
 
 	return (
-		<div className="bg-background mx-auto min-h-screen max-w-2xl p-4">
+		<div className="mx-auto min-h-screen max-w-2xl bg-background p-4">
 			<Button asChild variant="ghost">
 				<Link className="mb-6" href="/">
-					<ArrowLeft className="mr-2 h-4 w-4" />
+					<ArrowLeft className="mr-2 size-4" />
 					Join a room
 				</Link>
 			</Button>

@@ -29,7 +29,7 @@ export const Members = () => {
 						return (
 							<div key={member.id} className="flex flex-col items-center">
 								<div className="relative">
-									<Avatar className="h-16 w-16">
+									<Avatar className="size-16">
 										<AvatarFallback className="bg-muted text-muted-foreground">
 											{showVotes
 												? (vote ?? "X")
@@ -38,7 +38,7 @@ export const Members = () => {
 									</Avatar>
 
 									{vote != null && !showVotes && (
-										<div className="bg-muted text-muted-foreground border-border absolute -right-2 -bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-bold">
+										<div className="absolute -right-2 -bottom-2 flex size-8 items-center justify-center rounded-full border-2 border-border bg-muted text-sm font-bold text-muted-foreground">
 											✓
 										</div>
 									)}

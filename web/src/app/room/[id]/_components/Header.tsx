@@ -14,7 +14,7 @@ export const Header = () => {
 	return (
 		<header className="mb-8 flex items-center justify-between">
 			<div>
-				<h1 className="text-foreground text-3xl font-bold">{room.name}</h1>
+				<h1 className="text-3xl font-bold text-foreground">{room.name}</h1>
 				<div className="mt-2 flex items-center">
 					<Badge
 						variant="outline"
@@ -27,7 +27,7 @@ export const Header = () => {
 					</Badge>
 
 					<Badge className="flex items-center">
-						<Users className="mr-1 h-3 w-3" />
+						<Users className="mr-1 size-3" />
 						{members.length} Members
 					</Badge>
 				</div>
@@ -35,7 +35,7 @@ export const Header = () => {
 
 			<Button asChild variant="outline">
 				<Link href="/">
-					<DoorOpen className="mr-2 h-4 w-4" />
+					<DoorOpen className="mr-2 size-4" />
 					Exit Room
 				</Link>
 			</Button>

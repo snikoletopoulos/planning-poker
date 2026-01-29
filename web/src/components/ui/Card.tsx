@@ -10,7 +10,7 @@ export const Card = ({
 }) => (
 	<div
 		className={cn(
-			"bg-card text-card-foreground rounded-lg border shadow-sm",
+			"rounded-lg border bg-card text-card-foreground shadow-sm",
 			className,
 		)}
 		{...props}
@@ -47,7 +47,7 @@ export const CardDescription = ({
 }: React.HTMLAttributes<HTMLDivElement> & {
 	ref?: Ref<HTMLDivElement>;
 }) => (
-	<div className={cn("text-muted-foreground text-sm", className)} {...props} />
+	<div className={cn("text-sm text-muted-foreground", className)} {...props} />
 );
 
 export const CardContent = ({
