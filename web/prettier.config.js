@@ -16,6 +16,7 @@ export default {
 	tabWidth: 2,
 	proseWrap: "preserve",
 	htmlWhitespaceSensitivity: "css",
+	tailwindStylesheet: "./src/styles/globals.css",
 	importOrder: [
 		"^(react/(.*)$)|^(react$)",
 		"<THIRD_PARTY_MODULES>",
