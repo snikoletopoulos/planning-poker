@@ -1,8 +1,8 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { useTheme, type Theme } from "@/components/ThemeContext";
 import { Button } from "@/components/ui/Button";
 import {
 	DropdownMenu,
@@ -27,7 +27,7 @@ export const ThemeToggle = () => {
 			<DropdownMenuContent align="end">
 				<DropdownMenuRadioGroup
 					value={theme}
-					onValueChange={newTheme => setTheme(newTheme as Theme)}
+					onValueChange={newTheme => setTheme(newTheme)}
 				>
 					<DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
 					<DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>

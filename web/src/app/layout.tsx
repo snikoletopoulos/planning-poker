@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 
 import "@/styles/globals.css";
 import "@/lib/verifyEnv";
 
 import { NavBar } from "@/components/NavBar";
-import { ThemeProvider } from "@/components/ThemeContext";
 import { Toaster } from "@/components/ui/Toasts";
 
 const inter = Inter({ subsets: ["latin"] });
