@@ -2,8 +2,7 @@ import type { Ref } from "react";
 
 import { cn } from "@/lib/styles/utils";
 
-export interface TextareaProps
-	extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
 	ref?: Ref<HTMLTextAreaElement>;
 }
 

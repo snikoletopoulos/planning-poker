@@ -6,8 +6,9 @@ export interface ErrorProps {
 	reset: () => void;
 }
 
-export interface LayoutProps<TParams extends object = Record<string, never>>
-	extends PropsWithChildren {
+export interface LayoutProps<
+	TParams extends object = Record<string, never>,
+> extends PropsWithChildren {
 	params: Promise<TParams>;
 }
 

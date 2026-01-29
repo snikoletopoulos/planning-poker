@@ -1,5 +1,5 @@
 import { sign, verify } from "jsonwebtoken";
-import * as z from 'zod';
+import * as z from "zod";
 
 import type { Member, Room } from "../db/schema";
 

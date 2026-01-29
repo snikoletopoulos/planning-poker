@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import * as z from "zod";
 
 const EnvSchema = z.object({
 	DB_FILE_NAME: z.string().min(1),

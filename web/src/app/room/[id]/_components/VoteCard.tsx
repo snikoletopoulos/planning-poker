@@ -1,13 +1,13 @@
 "use client";
 
 import { ArrowRightIcon, Eye, EyeOff, RefreshCcw } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/styles/utils";
 import { uncompleteStoryAction } from "../_actions/stories";
 import { useRoom } from "./RoomContext";
-import { toast } from "sonner";
 
 const CARD_VALUES = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?"] as const;
 
@@ -56,11 +56,13 @@ export const VoteCard = () => {
 
 				<div className="mt-8 flex justify-center gap-8">
 					{activeStory.isCompleted ? (
-						<Button onClick={async () => {
-							const result = await uncompleteStoryAction(activeStory.id)
-							if (result) toast.error(result.error)
-						}}>
-							<RefreshCcw className="h-5 w-5" />
+						<Button
+							onClick={async () => {
+								const result = await uncompleteStoryAction(activeStory.id);
+								if (result) toast.error(result.error);
+							}}
+						>
+							<RefreshCcw className="size-5" />
 							Repoker story
 						</Button>
 					) : (

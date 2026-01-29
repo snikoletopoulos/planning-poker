@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import * as z from 'zod';
 
 import { Button } from "@/components/ui/Button";
 import {

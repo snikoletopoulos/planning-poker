@@ -5,7 +5,7 @@ import { ArrowRight, Users } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import * as z from 'zod';
 
 import { Button } from "@/components/ui/Button";
 import {
