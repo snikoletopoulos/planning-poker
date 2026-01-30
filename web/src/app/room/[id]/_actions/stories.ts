@@ -2,7 +2,7 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import * as z from 'zod';
+import * as z from "zod";
 
 import { getCurrentUser, getUserToken } from "@/helpers/user";
 import { db } from "@/lib/db";

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import * as z from 'zod';
+import * as z from "zod";
 
 import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";

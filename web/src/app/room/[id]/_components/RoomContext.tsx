@@ -11,7 +11,7 @@ import {
 } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { toast } from "sonner";
-import * as z from 'zod';
+import * as z from "zod";
 
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { getWsToken } from "@/helpers/ws";

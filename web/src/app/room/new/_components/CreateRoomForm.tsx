@@ -11,7 +11,7 @@ import {
 	useFormState,
 } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from 'zod';
+import * as z from "zod";
 
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardFooter } from "@/components/ui/Card";
