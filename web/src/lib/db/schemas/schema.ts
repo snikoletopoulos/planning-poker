@@ -1,21 +1,10 @@
-import { sql, type InferInsertModel, type InferSelectModel } from "drizzle-orm";
+import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
 import * as m from "drizzle-orm/mssql-core";
-import { v4 as uuid } from "uuid";
 
-const timestamps = {
-	updatedAt: m.datetime().notNull().defaultGetDate(),
-	createdAt: m
-		.datetime()
-		.notNull()
-		.defaultGetDate()
-		.$onUpdate(() => sql`getutcdate()`),
-};
+import { id, timestamps } from "../helpers";
 
 export const rooms = m.mssqlTable("rooms", {
-	id: m
-		.varchar()
-		.primaryKey()
-		.$defaultFn(() => uuid()),
+	id,
 	name: m.text().notNull(),
 	...timestamps,
 });
@@ -24,10 +13,7 @@ export type Room = InferSelectModel<typeof rooms>;
 export type NewRoom = InferInsertModel<typeof rooms>;
 
 export const stories = m.mssqlTable("stories", {
-	id: m
-		.varchar()
-		.primaryKey()
-		.$defaultFn(() => uuid()),
+	id,
 	title: m.text().notNull(),
 	description: m.text(),
 	isCompleted: m.bit().default(false),
@@ -42,10 +28,7 @@ export type Story = InferSelectModel<typeof stories>;
 export type NewStory = InferInsertModel<typeof stories>;
 
 export const members = m.mssqlTable("members", {
-	id: m
-		.varchar()
-		.primaryKey()
-		.$defaultFn(() => uuid()),
+	id,
 	name: m.text().notNull(),
 	roomId: m
 		.varchar()
