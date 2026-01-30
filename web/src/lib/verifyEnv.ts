@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 const EnvSchema = z.object({
-	DB_FILE_NAME: z.string().min(1),
+	DATABASE_URL: z.string().min(1),
 	AUTH_SECRET: z.string().min(1),
 	UPDATER_INTERNAL_URL: z.url(),
 	NEXT_PUBLIC_UPDATER_WS_URL: z.url(),
@@ -11,7 +11,7 @@ const EnvSchema = z.object({
 if (!process.env.DOCKER_BUILD) {
 	try {
 		EnvSchema.parse({
-			DB_FILE_NAME: process.env.DB_FILE_NAME,
+			DATABASE_URL: process.env.DATABASE_URL,
 			AUTH_SECRET: process.env.AUTH_SECRET,
 			UPDATER_INTERNAL_URL: process.env.UPDATER_INTERNAL_URL,
 			NEXT_PUBLIC_UPDATER_WS_URL: process.env.NEXT_PUBLIC_UPDATER_WS_URL,

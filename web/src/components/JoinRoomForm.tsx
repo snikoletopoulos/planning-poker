@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
-import type { Room } from "@/lib/db/schema";
+import type { Room } from "@/lib/db/schemas/schema";
 
 export const JoinRoomForm = ({
 	onSubmitAction,

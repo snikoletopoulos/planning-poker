@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/node-mssql";
 
-import * as schema from "./schema";
+import { relations } from "./schemas/relations";
 
-export const db = drizzle(process.env.DB_FILE_NAME, { schema });
+export const db = drizzle(process.env.DATABASE_URL, { relations });

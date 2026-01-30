@@ -5,9 +5,8 @@ loadEnvConfig(process.cwd());
 
 export default defineConfig({
 	out: "./src/lib/db/migrations",
-	schema: "./src/lib/db/schema.ts",
-	dialect: "sqlite",
-	dbCredentials: {
-		url: process.env.DB_FILE_NAME,
-	},
+	schema: "./src/lib/db/schemas",
+	dialect: "mssql",
+	casing: "snake_case",
+	dbCredentials: { url: process.env.DATABASE_URL },
 });

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/Card";
 import { createNewUser } from "@/helpers/user";
 import { db } from "@/lib/db";
-import { rooms, stories as storiesTable, type NewStory } from "@/lib/db/schema";
+import { rooms, stories as storiesTable, type NewStory } from "@/lib/db/schemas/schema";
 import { updateClients } from "@/services/live-update";
 import { CreateRoomForm } from "./_components/CreateRoomForm";
 

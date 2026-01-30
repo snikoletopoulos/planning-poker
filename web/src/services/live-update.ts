@@ -1,4 +1,4 @@
-import type { Member, Room, Story } from "@/lib/db/schema";
+import type { Member, Room, Story } from "@/lib/db/schemas/schema";
 
 interface UpdaterData {
 	userVoted: {

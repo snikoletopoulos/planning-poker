@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { v4 as uuid } from "uuid";
 
 import { db } from "@/lib/db";
-import { members, type Room } from "@/lib/db/schema";
+import { members, type Room } from "@/lib/db/schemas/schema";
 import { createToken, parseToken } from "@/lib/jwt";
 import type { Transaction } from "@/types/db";
 
