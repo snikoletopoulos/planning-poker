@@ -13,10 +13,6 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-// const compat = new FlatComptseslint.confitseslint.configgat({
-// 	baseDirectory: import.meta.dirname,
-// });
-
 export default defineConfig(
 	globalIgnores(["src/lib/db/migrations/*", ".next/**", "next-env.d.ts"]),
 	{
@@ -34,7 +30,7 @@ export default defineConfig(
 			/* Enforce camelCase */
 			camelcase: ["error", { allow: ["required_error"] }],
 			/* We allow console for debug and error reporting */
-			"no-console": "error",
+			// "no-console": "error",
 			/* Allow void for async functions */
 			"no-void": ["error", { allowAsStatement: true }],
 			/* Disabled this rule since it doesn't allow re-exporting default from index files */
@@ -250,7 +246,6 @@ export default defineConfig(
 		extends: [reactHooks.configs.flat.recommended],
 	},
 	pluginQuery.configs["flat/recommended"],
-
 	nextPlugin.configs["core-web-vitals"],
 	{ name: "Prettier", ...prettier },
 );

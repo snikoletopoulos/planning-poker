@@ -10,13 +10,7 @@ const EnvSchema = z.object({
 
 if (!process.env.DOCKER_BUILD) {
 	try {
-		EnvSchema.parse({
-			DATABASE_URL: process.env.DATABASE_URL,
-			AUTH_SECRET: process.env.AUTH_SECRET,
-			UPDATER_INTERNAL_URL: process.env.UPDATER_INTERNAL_URL,
-			NEXT_PUBLIC_UPDATER_WS_URL: process.env.NEXT_PUBLIC_UPDATER_WS_URL,
-			NEXT_PUBLIC_UPDATER_HTTP_URL: process.env.NEXT_PUBLIC_UPDATER_HTTP_URL,
-		});
+		EnvSchema.parse(process.env);
 	} catch (error) {
 		console.error("Error verifying environment variables:", error);
 		process.exit(1);
