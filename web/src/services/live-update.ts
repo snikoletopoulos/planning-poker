@@ -1,8 +1,9 @@
-import type { Member, Room, Story } from "@/lib/db/schemas/schema";
+import type { User } from "@/lib/db/schemas/auth-schema";
+import type { Room, Story } from "@/lib/db/schemas/schema";
 
 interface UpdaterData {
 	userVoted: {
-		memberId: Member["id"];
+		memberId: User["id"];
 		storyId: Story["id"];
 		vote: number | null;
 	};
@@ -14,7 +15,7 @@ interface UpdaterData {
 		storyId: Story["id"];
 	};
 	membersJoined: {
-		member: Pick<Member, "id" | "name">;
+		member: Pick<User, "id" | "name">;
 		roomId: Room["id"];
 	};
 }

@@ -1,7 +1,7 @@
 import { sign, verify } from "jsonwebtoken";
 import * as z from "zod";
 
-import type { Member, Room } from "../db/schema";
+import type { Member, Room } from "../db/schemas/schema";
 
 export const createToken = (payload: {
 	id: Member["id"];

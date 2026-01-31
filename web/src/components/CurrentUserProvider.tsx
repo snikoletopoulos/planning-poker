@@ -2,7 +2,7 @@
 
 import { createContext, useContext, type PropsWithChildren } from "react";
 
-import type { Member } from "@/lib/db/schema";
+import type { Member } from "@/lib/db/schemas/schema";
 
 export interface CurrentUser {
 	id: Member["id"];
