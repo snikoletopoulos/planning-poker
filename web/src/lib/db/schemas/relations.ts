@@ -16,23 +16,23 @@ export const relations = defineRelations({ ...schema, ...authSchema }, r => ({
 	},
 
 	rooms: {
-		stories: r.many.stories(),
-		members: r.many.members(),
+		stories: r.many.story(),
+		members: r.many.user(),
 	},
 	stories: {
-		votes: r.many.votes(),
-		room: r.one.rooms({
-			from: r.stories.roomId,
-			to: r.rooms.id,
+		votes: r.many.vote(),
+		room: r.one.room({
+			from: r.story.roomId,
+			to: r.room.id,
 			// optional: false,
 		}),
 	},
 	members: {
-		room: r.one.rooms({ from: r.members.roomId, to: r.rooms.id }),
-		votes: r.many.votes(),
+		room: r.one.room({ from: r.member.roomId, to: r.room.id }),
+		votes: r.many.vote(),
 	},
 	votes: {
-		members: r.one.members({ from: r.votes.memberId, to: r.members.id }),
-		stories: r.one.stories({ from: r.votes.storyId, to: r.stories.id }),
+		members: r.one.member({ from: r.vote.memberId, to: r.member.id }),
+		stories: r.one.story({ from: r.vote.storyId, to: r.story.id }),
 	},
 }));

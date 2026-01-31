@@ -3,16 +3,16 @@ import * as m from "drizzle-orm/mssql-core";
 
 import { id, timestamps } from "../helpers";
 
-export const rooms = m.mssqlTable("rooms", {
+export const room = m.mssqlTable("rooms", {
 	id,
 	name: m.text().notNull(),
 	...timestamps,
 });
 
-export type Room = InferSelectModel<typeof rooms>;
-export type NewRoom = InferInsertModel<typeof rooms>;
+export type Room = InferSelectModel<typeof room>;
+export type NewRoom = InferInsertModel<typeof room>;
 
-export const stories = m.mssqlTable("stories", {
+export const story = m.mssqlTable("stories", {
 	id,
 	title: m.text().notNull(),
 	description: m.text(),
@@ -20,14 +20,14 @@ export const stories = m.mssqlTable("stories", {
 	roomId: m
 		.varchar()
 		.notNull()
-		.references(() => rooms.id, { onDelete: "cascade" }),
+		.references(() => room.id, { onDelete: "cascade" }),
 	...timestamps,
 });
 
-export type Story = InferSelectModel<typeof stories>;
-export type NewStory = InferInsertModel<typeof stories>;
+export type Story = InferSelectModel<typeof story>;
+export type NewStory = InferInsertModel<typeof story>;
 
-export const members = m.mssqlTable("members", {
+export const member = m.mssqlTable("members", {
 	id,
 	name: m.text().notNull(),
 	roomId: m
@@ -38,16 +38,16 @@ export const members = m.mssqlTable("members", {
 	...timestamps,
 });
 
-export type Member = InferSelectModel<typeof members>;
-export type NewMember = InferInsertModel<typeof members>;
+export type Member = InferSelectModel<typeof member>;
+export type NewMember = InferInsertModel<typeof member>;
 
-export const votes = m.mssqlTable(
+export const vote = m.mssqlTable(
 	"votes",
 	{
 		memberId: m
 			.varchar()
 			.notNull()
-			.references(() => members.id, { onDelete: "cascade" }),
+			.references(() => member.id, { onDelete: "cascade" }),
 		storyId: m.varchar().notNull(),
 		// TODO: .references(() => stories.id, { onDelete: "cascade" }),
 		vote: m.int(),
@@ -60,5 +60,5 @@ export const votes = m.mssqlTable(
 	],
 );
 
-export type Vote = InferSelectModel<typeof votes>;
-export type NewVote = InferInsertModel<typeof votes>;
+export type Vote = InferSelectModel<typeof vote>;
+export type NewVote = InferInsertModel<typeof vote>;
