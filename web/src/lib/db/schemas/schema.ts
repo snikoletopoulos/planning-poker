@@ -1,23 +1,24 @@
 import { type InferInsertModel, type InferSelectModel } from "drizzle-orm";
-import * as m from "drizzle-orm/mssql-core";
+import * as p from "drizzle-orm/pg-core";
 
 import { id, timestamps } from "../helpers";
+import { user } from "./auth-schema";
 
-export const room = m.mssqlTable("rooms", {
+export const room = p.pgTable("rooms", {
 	id,
-	name: m.text().notNull(),
+	name: p.text().notNull(),
 	...timestamps,
 });
 
 export type Room = InferSelectModel<typeof room>;
 export type NewRoom = InferInsertModel<typeof room>;
 
-export const story = m.mssqlTable("stories", {
+export const story = p.pgTable("stories", {
 	id,
-	title: m.text().notNull(),
-	description: m.text(),
-	isCompleted: m.bit().default(false),
-	roomId: m
+	title: p.text().notNull(),
+	description: p.text(),
+	isCompleted: p.boolean().default(false),
+	roomId: p
 		.varchar()
 		.notNull()
 		.references(() => room.id, { onDelete: "cascade" }),
@@ -27,34 +28,36 @@ export const story = m.mssqlTable("stories", {
 export type Story = InferSelectModel<typeof story>;
 export type NewStory = InferInsertModel<typeof story>;
 
-export const member = m.mssqlTable("members", {
+export const member = p.pgTable("members", {
 	id,
-	name: m.text().notNull(),
-	roomId: m
+	roomId: p
 		.varchar()
 		.notNull()
-		.references(() => rooms.id, { onDelete: "cascade" }),
-	accessToken: m.text("access_token").notNull(),
+		.references(() => room.id, { onDelete: "cascade" }),
+	userId: p
+		.varchar()
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
 	...timestamps,
 });
 
 export type Member = InferSelectModel<typeof member>;
 export type NewMember = InferInsertModel<typeof member>;
 
-export const vote = m.mssqlTable(
+export const vote = p.pgTable(
 	"votes",
 	{
-		memberId: m
+		memberId: p
 			.varchar()
 			.notNull()
 			.references(() => member.id, { onDelete: "cascade" }),
-		storyId: m.varchar().notNull(),
+		storyId: p.varchar().notNull(),
 		// TODO: .references(() => stories.id, { onDelete: "cascade" }),
-		vote: m.int(),
+		vote: p.integer(),
 		...timestamps,
 	},
 	t => [
-		m.primaryKey({
+		p.primaryKey({
 			columns: [t.memberId, t.storyId],
 		}),
 	],

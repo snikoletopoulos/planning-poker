@@ -1,17 +1,17 @@
 import { sql } from "drizzle-orm";
-import * as m from "drizzle-orm/mssql-core";
+import * as p from "drizzle-orm/pg-core";
 import { v4 as uuid } from "uuid";
 
-export const id = m
+export const id = p
 	.varchar()
 	.primaryKey()
 	.$defaultFn(() => uuid());
 
 export const timestamps = {
-	updatedAt: m.datetime().notNull().defaultGetDate(),
-	createdAt: m
-		.datetime()
+	updatedAt: p.date().notNull().defaultNow(),
+	createdAt: p
+		.date()
 		.notNull()
-		.defaultGetDate()
+		.defaultNow()
 		.$onUpdate(() => sql`getutcdate()`),
 };
