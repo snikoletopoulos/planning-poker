@@ -19,11 +19,12 @@ import {
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import type { Room } from "@/lib/db/schemas/schema";
+import { Separator } from "./ui/Separator";
 
 export const JoinRoomForm = ({
 	onSubmitAction,
 	roomName,
-	roomCode,
+	roomCode = "",
 }: {
 	onSubmitAction: (
 		data: z.infer<typeof JoinRoomSchema>,
@@ -38,10 +39,7 @@ export const JoinRoomForm = ({
 		setError,
 	} = useForm({
 		resolver: zodResolver(JoinRoomSchema),
-		defaultValues: {
-			name: "",
-			roomCode: roomCode ?? "",
-		},
+		defaultValues: { roomCode },
 	});
 
 	const handleJoinRoom = handleSubmit(async data => {
@@ -77,38 +75,30 @@ export const JoinRoomForm = ({
 						<p className="text-sm text-red-500">{errors.roomCode.message}</p>
 					)}
 				</div>
-
-				<div className="space-y-2">
-					<Label htmlFor="name">Your Name</Label>
-					<Input
-						id="name"
-						{...register("name")}
-						placeholder="Enter your name"
-					/>
-					{errors.name && (
-						<p className="text-sm text-red-500">{errors.name.message}</p>
-					)}
-				</div>
 			</CardContent>
 
-			<CardFooter className="flex justify-between">
-				{!roomCode && (
-					<Button variant="outline" asChild>
-						<Link href="/room/new">
-							Create Room
-							<ArrowRight className="ml-2 size-4" />
-						</Link>
-					</Button>
-				)}
-
+			<CardFooter className="flex flex-col justify-between gap-6">
 				<Button
-					className="ml-auto"
+					className="w-full"
 					onClick={handleJoinRoom}
 					disabled={!isValid || isSubmitting}
 				>
 					Join Room
 					<Users className="ml-2 size-4" />
 				</Button>
+
+				{!roomCode && (
+					<>
+						<Separator />
+
+						<Button className="w-full" variant="outline" asChild>
+							<Link href="/room/new">
+								Create Room
+								<ArrowRight className="ml-2 size-4" />
+							</Link>
+						</Button>
+					</>
+				)}
 			</CardFooter>
 		</Card>
 	);
@@ -116,5 +106,4 @@ export const JoinRoomForm = ({
 
 const JoinRoomSchema = z.object({
 	roomCode: z.string().min(1, "Room code is required"),
-	name: z.string().min(1, "Name is required"),
 });

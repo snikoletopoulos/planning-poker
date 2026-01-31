@@ -1,46 +1,41 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import * as z from "zod";
 
-import { createNewUser } from "@/helpers/user";
+import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
+import { member } from "@/lib/db/schemas/schema";
 import { updateClients } from "@/services/live-update";
 
 const JoinRoomInputSchema = z.object({
-	name: z.string().trim().min(1, "Name is required"),
 	roomCode: z.string().trim().min(1, "Room code is required"),
 });
 
 export const joinRoomAction = async (
 	data: z.infer<typeof JoinRoomInputSchema>,
 ) => {
+	const session = await auth.api.getSession({ headers: await headers() });
+	if (!session) return { error: "You must be logged in to join a room" };
+
 	const result = JoinRoomInputSchema.safeParse(data);
 	if (!result.success) return { error: result.error.message };
-	const { name, roomCode } = result.data;
+	const { roomCode } = result.data;
 
-	const room = await db.query.rooms.findFirst({
-		where: (rooms, { eq }) => eq(rooms.id, roomCode),
+	const room = await db.query.room.findFirst({
+		where: (room, { eq }) => eq(room.id, roomCode),
 		with: { members: true },
 	});
 	if (!room) return { error: "Room not found" };
 
-	const cookieStore = await cookies();
-	const token = cookieStore.get(room.id)?.value;
-	if (token) {
-		const user = room.members.find(member => member.accessToken === token);
-		if (!user) return { error: "User not found" };
-		redirect(`/room/${room.id}`);
-	}
-
-	const { user, token: newToken } = await createNewUser(name, room.id);
+	db.insert(member).values({ roomId: room.id, userId: session.user.id });
 
 	try {
 		const result = await updateClients(newToken, "membersJoined", {
 			roomId: roomCode,
-			member: user,
+			member: session.user,
 		});
 		if (result) return result;
 	} catch (error) {
