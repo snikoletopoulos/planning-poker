@@ -2,11 +2,15 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import * as z from "zod";
 
-import { getCurrentUser, getUserToken } from "@/helpers/user";
+import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
-import { stories, votes } from "@/lib/db/schema";
+import {
+	story as storyTable,
+	vote as voteTable,
+} from "@/lib/db/schemas/schema";
 import { updateClients } from "@/services/live-update";
 
 const AddStoryInputSchema = z.object({
@@ -14,8 +18,8 @@ const AddStoryInputSchema = z.object({
 		.string()
 		.trim()
 		.refine(async roomId => {
-			const room = await db.query.rooms.findFirst({
-				where: (rooms, { eq }) => eq(rooms.id, roomId),
+			const room = await db.query.room.findFirst({
+				where: (room, { eq }) => eq(room.id, roomId),
 			});
 			return !!room;
 		}, "Room not found"),
@@ -31,7 +35,7 @@ export const addStoryAction = async (
 	const { roomId, title, description } = result.data;
 
 	const storiesResult = await db
-		.insert(stories)
+		.insert(storyTable)
 		.values({
 			roomId,
 			title,
@@ -42,9 +46,7 @@ export const addStoryAction = async (
 	if (!storiesResult[0]) return { error: "Story not found" };
 
 	try {
-		const token = await getUserToken(roomId);
-		if (!token) return { error: "Unauthorized" };
-		return await updateClients(token, "addStory", storiesResult[0]);
+		return await updateClients(null, "addStory", storiesResult[0]);
 	} catch (error) {
 		console.error("Error updating live data: (newStory)", error);
 		revalidatePath(`/room/${roomId}`);
@@ -58,8 +60,8 @@ const CompleteStoryInputSchema = z.object({
 		.string()
 		.trim()
 		.refine(async storyId => {
-			const story = await db.query.stories.findFirst({
-				where: (stories, { eq }) => eq(stories.id, storyId),
+			const story = await db.query.story.findFirst({
+				where: (story, { eq }) => eq(story.id, storyId),
 			});
 			return !!story;
 		}, "Story not found"),
@@ -72,8 +74,8 @@ export const completeStoryAction = async (
 	if (!result.success) return { error: result.error.message };
 	const { storyId } = result.data;
 
-	const story = await db.query.stories.findFirst({
-		where: (stories, { eq }) => eq(stories.id, storyId),
+	const story = await db.query.story.findFirst({
+		where: (story, { eq }) => eq(story.id, storyId),
 		with: { votes: true },
 	});
 
@@ -82,14 +84,12 @@ export const completeStoryAction = async (
 		return { error: "A Story needs votes to be completed" };
 
 	await db
-		.update(stories)
+		.update(storyTable)
 		.set({ isCompleted: true })
-		.where(eq(stories.id, storyId));
+		.where(eq(storyTable.id, storyId));
 
 	try {
-		const token = await getUserToken(story.roomId);
-		if (!token) return { error: "Unauthorized" };
-		return await updateClients(token, "completeStory", { storyId });
+		return await updateClients(null, "completeStory", { storyId });
 	} catch (error) {
 		console.error("Error updating live data: (completeStory)", error);
 		revalidatePath(`/room/${story.roomId}`);
@@ -102,8 +102,8 @@ const UncompleteStoryInputSchema = z
 	.string()
 	.trim()
 	.refine(async storyId => {
-		const story = await db.query.stories.findFirst({
-			where: (stories, { eq }) => eq(stories.id, storyId),
+		const story = await db.query.story.findFirst({
+			where: (story, { eq }) => eq(story.id, storyId),
 		});
 		return !!story;
 	}, "Story not found");
@@ -115,25 +115,22 @@ export const uncompleteStoryAction = async (
 	if (!result.success) return { error: result.error.message };
 	const storyId = result.data;
 
-	const story = db.transaction(tx => {
-		const story = tx
-			.update(stories)
+	const story = await db.transaction(async tx => {
+		const storyPromise =  tx
+			.update(storyTable)
 			.set({ isCompleted: false })
-			.where(eq(stories.id, storyId))
-			.returning()
-			.get();
+			.where(eq(storyTable.id, storyId))
+			.returning();
 
-		tx.delete(votes).where(eq(votes.storyId, storyId)).run();
-		return story;
+		await tx.delete(voteTable).where(eq(voteTable.storyId, storyId));
+		return (await storyPromise)[0];
 	});
 
 	try {
-		const token = await getUserToken(story.roomId);
-		if (!token) return { error: "Unauthorized" };
-		return await updateClients(token, "uncompleteStory", { storyId });
+		return await updateClients(null, "uncompleteStory", { storyId });
 	} catch (error) {
 		console.error("Error updating live data: (uncompleteStory)", error);
-		revalidatePath(`/room/${story.roomId}`);
+		revalidatePath(`/room/${story?.roomId ?? ""}`);
 		if (error instanceof Error) return { error: error.message };
 		return { error: "Error updating live data" };
 	}
@@ -144,8 +141,8 @@ const VoteForStoryInputSchema = z.object({
 		.string()
 		.trim()
 		.refine(async storyId => {
-			const story = await db.query.stories.findFirst({
-				where: (stories, { eq }) => eq(stories.id, storyId),
+			const story = await db.query.story.findFirst({
+				where: (story, { eq }) => eq(story.id, storyId),
 			});
 			return !!story;
 		}, "Story not found"),
@@ -155,46 +152,44 @@ const VoteForStoryInputSchema = z.object({
 export const voteForStoryAction = async (
 	data: z.infer<typeof VoteForStoryInputSchema>,
 ) => {
+	const session = await auth.api.getSession({ headers: await headers() });
+	if (!session) return { error: "Unauthorized" };
+	const userId = session.user.id;
+
 	const result = await VoteForStoryInputSchema.safeParseAsync(data);
 	if (!result.success) return { error: result.error.message };
 	const { vote, storyId } = result.data;
 
-	const story = await db.query.stories.findFirst({
-		where: (stories, { eq }) => eq(stories.id, storyId),
+	const story = await db.query.story.findFirst({
+		where: (story, { eq }) => eq(story.id, storyId),
 		with: { votes: true },
 	});
 
 	if (!story) return { error: "Story not found" };
 	if (story.isCompleted) return { error: "Story is already completed" };
-	const currentUser = await getCurrentUser(story.roomId);
-	if (!currentUser) return { error: "Unauthorized" };
 
-	const existingVote = story.votes.find(
-		vote => vote.memberId === currentUser.id,
-	);
+	const existingVote = story.votes.find(vote => vote.userId === userId);
 	if (existingVote) {
 		await db
-			.update(votes)
+			.update(voteTable)
 			.set({ vote: typeof vote === "number" ? vote : null })
 			.where(
 				and(
-					eq(votes.memberId, existingVote.memberId),
-					eq(votes.storyId, existingVote.storyId),
+					eq(voteTable.userId, existingVote.userId),
+					eq(voteTable.storyId, existingVote.storyId),
 				),
 			);
 	} else {
-		await db.insert(votes).values({
-			memberId: currentUser.id,
+		await db.insert(voteTable).values({
+			userId,
 			storyId,
 			vote: typeof vote === "number" ? vote : null,
 		});
 	}
 
 	try {
-		const token = await getUserToken(story.roomId);
-		if (!token) return { error: "Unauthorized" };
-		return await updateClients(token, "userVoted", {
-			memberId: currentUser.id,
+		return await updateClients(null, "userVoted", {
+			userId,
 			storyId,
 			vote,
 		});

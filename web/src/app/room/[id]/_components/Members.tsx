@@ -8,6 +8,7 @@ import { useRoom } from "./RoomContext";
 export const Members = () => {
 	const currentUser = useCurrentUser();
 	const { members, activeStory } = useRoom();
+
 	const showVotes = activeStory.isCompleted;
 
 	return (
@@ -18,7 +19,7 @@ export const Members = () => {
 				<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 					{members.map(member => {
 						const voteData = activeStory.votes.find(
-							v => v.memberId === member.id,
+							vote => vote.userId === member.id,
 						);
 
 						let vote: number | "?" | null = null;

@@ -15,7 +15,8 @@ import * as z from "zod";
 
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { getWsToken } from "@/helpers/ws";
-import type { Member, Room, Story, Vote } from "@/lib/db/schema";
+import type { User } from "@/lib/db/schemas/auth-schema";
+import type { Room, Story, Vote } from "@/lib/db/schemas/schema";
 import { completeStoryAction, voteForStoryAction } from "../_actions/stories";
 
 interface StoryWithVotes extends Story {
@@ -25,7 +26,7 @@ interface StoryWithVotes extends Story {
 interface RoomContextData {
 	room: Room;
 	stories: StoryWithVotes[];
-	members: Pick<Member, "id" | "name">[];
+	members: Pick<User, "id" | "name">[];
 	activeStory: StoryWithVotes;
 	changeActiveStory: (storyId: Story["id"]) => void;
 	selectedCard: number | "?" | null;
@@ -42,12 +43,12 @@ export const RoomProvider = ({
 	stories: initialStories,
 	members: initialMembers,
 	children,
-	authToken,
+	authToken = "",
 }: PropsWithChildren<{
 	room: Room;
 	stories: StoryWithVotes[];
-	members: Pick<Member, "id" | "name">[];
-	authToken: string;
+	members: Pick<User, "id" | "name">[];
+	authToken?: string;
 }>) => {
 	const currentUser = useCurrentUser();
 
@@ -61,24 +62,24 @@ export const RoomProvider = ({
 	const activeStory = stories[activeStoryIndex];
 	const [selectedCard, setSelectedCard] = useState<number | "?" | null>(() => {
 		const userVote = activeStory?.votes.find(
-			vote => vote.memberId === currentUser.id,
+			vote => vote.userId === currentUser.id,
 		);
 		if (!userVote) return null;
-		return userVote.vote ? +userVote.vote : "?";
+		return userVote.vote ? userVote.vote : "?"; // TODO: check this case
 	});
 	const [isLiveUpdating, setIsLiveUpdating] = useState(false);
 
 	useEffect(() => {
-		const story = stories[activeStoryIndex];
-		if (!story) throw new Error("Story not found");
+		// TODO: handle this case
+		if (!activeStory) throw new Error("Story not found");
 
-		const userVote = story.votes.find(vote => vote.memberId === currentUser.id);
+		const userVote = activeStory.votes.find(vote => vote.userId === currentUser.id);
 		if (!userVote) {
 			setSelectedCard(null);
 			return;
 		}
-		setSelectedCard(userVote.vote != null ? +userVote.vote : "?");
-	}, [stories, activeStoryIndex, currentUser.id]);
+		setSelectedCard(userVote.vote != null ? userVote.vote : "?");
+	}, [stories, activeStoryIndex, currentUser.id, activeStory]);
 
 	const selectCard = useCallback(
 		async (card: number | "?" | null) => {
@@ -129,7 +130,7 @@ export const RoomProvider = ({
 					const story = stories.find(story => story.id === data.storyId);
 					if (!story) return stories;
 					const exitingVoteIndex = story.votes.findIndex(
-						vote => vote.memberId === currentUser.id,
+						vote => vote.userId === currentUser.id,
 					);
 
 					if (exitingVoteIndex === -1) {
@@ -140,6 +141,7 @@ export const RoomProvider = ({
 							createdAt: new Date(),
 						});
 					} else {
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 						story.votes[exitingVoteIndex]!.vote = data.vote;
 					}
 
@@ -154,7 +156,7 @@ export const RoomProvider = ({
 					const story = stories.find(story => story.id === data.storyId);
 					if (!story) return stories;
 					const exitingVoteIndex = story.votes.findIndex(
-						vote => vote.memberId === data.memberId,
+						vote => vote.userId === data.memberId,
 					);
 
 					if (exitingVoteIndex === -1) {
@@ -233,6 +235,7 @@ export const RoomProvider = ({
 	);
 
 	const value = useMemo(() => {
+		// TODO: handle this case
 		if (!activeStory) return null;
 		return {
 			room,
@@ -291,10 +294,11 @@ const WsEventSchema = z.discriminatedUnion("action", [
 		votes: z.array(
 			z.object({
 				vote: z.number().nullable(),
-				memberId: z.string(),
+				userId: z.string(),
 				createdAt: z.string(),
 				storyId: z.string(),
-			} satisfies Record<keyof Vote, z.ZodTypeAny>),
+				updatedAt: z.string(),
+			} satisfies Record<keyof Vote, z.ZodType>),
 		),
 	}),
 	z.object({

@@ -45,12 +45,15 @@ const StoryList = () => {
 			<CardContent className="space-y-4 p-4">
 				{stories.map(story => {
 					const calculateAverage = () => {
-						const numericVotes = story.votes.reduce((acc, { vote }) => {
-							if (vote == null) return acc;
-							if (isNaN(+vote)) return acc;
-							acc.push(+vote);
-							return acc;
-						}, [] as number[]);
+						const numericVotes = story.votes.reduce<number[]>(
+							(acc, { vote }) => {
+								if (vote == null) return acc;
+								if (isNaN(vote)) return acc;
+								acc.push(vote);
+								return acc;
+							},
+							[],
+						);
 
 						if (numericVotes.length === 0) return "N/A";
 

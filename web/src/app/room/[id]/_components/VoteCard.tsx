@@ -104,12 +104,12 @@ const Summary = () => {
 	const { activeStory } = useRoom();
 
 	const calculateAverage = () => {
-		const numericVotes = activeStory.votes.reduce((acc, { vote }) => {
+		const numericVotes = activeStory.votes.reduce<number[]>((acc, { vote }) => {
 			if (vote == null) return acc;
-			if (isNaN(+vote)) return acc;
-			acc.push(+vote);
+			if (isNaN(vote)) return acc;
+			acc.push(vote);
 			return acc;
-		}, [] as number[]);
+		}, []);
 
 		if (numericVotes.length === 0) return "N/A";
 
@@ -126,11 +126,10 @@ const Summary = () => {
 			(acc, vote) => {
 				if (vote == null) return acc;
 
-				const voteNumber = +vote;
-				if (isNaN(voteNumber)) return acc;
+				if (isNaN(vote)) return acc;
 
-				if (voteNumber < acc.min) acc.min = voteNumber;
-				if (voteNumber > acc.max) acc.max = voteNumber;
+				if (vote < acc.min) acc.min = vote;
+				if (vote > acc.max) acc.max = vote;
 
 				return acc;
 			},
