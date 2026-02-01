@@ -74,7 +74,9 @@ export const RoomProvider = ({
 		// TODO: handle this case
 		if (!activeStory) throw new Error("Story not found");
 
-		const userVote = activeStory.votes.find(vote => vote.userId === currentUser.id);
+		const userVote = activeStory.votes.find(
+			vote => vote.userId === currentUser.id,
+		);
 		if (!userVote) {
 			setSelectedCard(null);
 			return;
@@ -138,8 +140,9 @@ export const RoomProvider = ({
 						story.votes.push({
 							vote: data.vote,
 							storyId: data.storyId,
-							memberId: currentUser.id,
+							userId: currentUser.id,
 							createdAt: new Date(),
+							updatedAt: new Date(),
 						});
 					} else {
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -164,8 +167,9 @@ export const RoomProvider = ({
 						story.votes.push({
 							vote: null,
 							storyId: data.storyId,
-							memberId: data.memberId,
+							userId: data.memberId,
 							createdAt: new Date(),
+							updatedAt: new Date(),
 						});
 					}
 
@@ -181,6 +185,7 @@ export const RoomProvider = ({
 					story.votes = data.votes.map(story => ({
 						...story,
 						createdAt: new Date(story.createdAt),
+						updatedAt: new Date(story.updatedAt),
 					}));
 
 					story.isCompleted = true;
@@ -213,6 +218,7 @@ export const RoomProvider = ({
 					{
 						...data.story,
 						createdAt: new Date(data.story.createdAt),
+						updatedAt: new Date(data.story.updatedAt),
 						votes: [],
 					},
 				]);
@@ -296,8 +302,8 @@ const WsEventSchema = z.discriminatedUnion("action", [
 			z.object({
 				vote: z.number().nullable(),
 				userId: z.string(),
-				createdAt: z.string(),
 				storyId: z.string(),
+				createdAt: z.string(),
 				updatedAt: z.string(),
 			} satisfies Record<keyof Vote, z.ZodType>),
 		),
@@ -322,7 +328,8 @@ const WsEventSchema = z.discriminatedUnion("action", [
 			isCompleted: z.boolean(),
 			roomId: z.string(),
 			createdAt: z.string(),
-		}),
+			updatedAt: z.string(),
+		} satisfies Record<keyof Story, z.ZodType>),
 	}),
 	z.object({ action: z.literal("next_story") }),
 ]);
