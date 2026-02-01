@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
+import { joinRoomAction } from "@/app/(protected)/_actions/JoinRoom";
 import { JoinRoomForm } from "@/components/JoinRoomForm";
-import { joinRoomAction } from "./_actions/JoinRoom";
 
 export const metadata: Metadata = {
 	title: "Join | Planning Poker",
