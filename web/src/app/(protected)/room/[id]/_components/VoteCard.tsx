@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/styles/utils";
-import { uncompleteStoryAction } from "../_actions/stories";
+import { resetStoryAction } from "../_actions/resetStory";
 import { useRoom } from "./RoomContext";
 
 const CARD_VALUES = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?"] as const;
@@ -58,7 +58,7 @@ export const VoteCard = () => {
 					{activeStory.isCompleted ? (
 						<Button
 							onClick={async () => {
-								const result = await uncompleteStoryAction(activeStory.id);
+								const result = await resetStoryAction(activeStory.id);
 								if (result) toast.error(result.error);
 							}}
 						>

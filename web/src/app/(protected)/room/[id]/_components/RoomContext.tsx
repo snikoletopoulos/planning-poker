@@ -17,7 +17,8 @@ import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { getWsToken } from "@/helpers/ws";
 import type { User } from "@/lib/db/schemas/auth-schema";
 import type { Room, Story, Vote } from "@/lib/db/schemas/schema";
-import { completeStoryAction, voteForStoryAction } from "../_actions/stories";
+import { completeStoryAction } from "../_actions/completeStory";
+import { voteAction } from "../_actions/vote";
 
 interface StoryWithVotes extends Story {
 	votes: Vote[];
@@ -85,7 +86,7 @@ export const RoomProvider = ({
 		async (card: number | "?" | null) => {
 			if (!activeStory) return;
 			setSelectedCard(card);
-			const result = await voteForStoryAction({
+			const result = await voteAction({
 				storyId: activeStory.id,
 				vote: card === "?" ? null : card,
 			});

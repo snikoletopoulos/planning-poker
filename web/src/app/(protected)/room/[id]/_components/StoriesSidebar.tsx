@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { cn } from "@/lib/styles/utils";
-import { addStoryAction } from "../_actions/stories";
+import { createStoryAction } from "../_actions/createStory";
 import { useRoom } from "./RoomContext";
 
 export const StoriesSidebar = () => {
@@ -108,7 +108,7 @@ const AddStory = ({ onComplete }: { onComplete: () => void }) => {
 	const handleAddStory = handleSubmit(async data => {
 		try {
 			const result = await toast
-				.promise(addStoryAction({ ...data, roomId: room.id }), {
+				.promise(createStoryAction({ ...data, roomId: room.id }), {
 					loading: "Adding story...",
 					success: "Story added successfully",
 					error: "Error adding story",
