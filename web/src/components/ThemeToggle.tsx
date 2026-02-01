@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/styles/utils";
 
 export const ThemeToggle = () => (
-	<DropdownMenu open>
+	<DropdownMenu>
 		<DropdownMenuTrigger asChild>
 			<Button variant="outline" size="icon" className="rounded-full">
 				<Sun className="size-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
