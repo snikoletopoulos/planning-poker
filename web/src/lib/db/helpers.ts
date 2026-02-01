@@ -13,5 +13,5 @@ export const timestamps = {
 		.timestamp()
 		.notNull()
 		.defaultNow()
-		.$onUpdate(() => sql`getutcdate()`),
+		.$onUpdate(() => sql`now()`),
 };

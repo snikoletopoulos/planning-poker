@@ -50,7 +50,7 @@ export const vote = p.pgTable(
 		userId: p
 			.varchar()
 			.notNull()
-			.references(() => member.id, { onDelete: "cascade" }),
+			.references(() => user.id, { onDelete: "cascade" }),
 		storyId: p
 			.varchar()
 			.notNull()
