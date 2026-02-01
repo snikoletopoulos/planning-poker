@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 
-// import * as authSchema from "./auth-schema";
 import { account, session, user } from "./auth-schema";
 import { member, room, story, vote } from "./schema";
 
@@ -26,7 +25,7 @@ export const accountRelations = relations(account, ({ one }) => ({
 
 export const roomRelations = relations(room, ({ many }) => ({
 	stories: many(story),
-	members: many(user),
+	members: many(member),
 }));
 
 export const storyRelations = relations(story, ({ many, one }) => ({
@@ -37,20 +36,23 @@ export const storyRelations = relations(story, ({ many, one }) => ({
 	}),
 }));
 
-export const memberRelations = relations(member, ({ many, one }) => ({
+export const memberRelations = relations(member, ({ one }) => ({
 	room: one(room, {
 		fields: [member.roomId],
 		references: [room.id],
 	}),
-	votes: many(vote),
+	user: one(user, {
+		fields: [member.userId],
+		references: [user.id],
+	}),
 }));
 
-export const voteRelations = relations(vote, ({ many, one }) => ({
-	members: one(member, {
-		fields: [vote.memberId],
-		references: [member.id],
+export const voteRelations = relations(vote, ({ one }) => ({
+	user: one(user, {
+		fields: [vote.userId],
+		references: [user.id],
 	}),
-	stories: one(story, {
+	story: one(story, {
 		fields: [vote.storyId],
 		references: [story.id],
 	}),

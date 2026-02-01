@@ -33,9 +33,9 @@ export const joinRoomAction = async (
 	db.insert(member).values({ roomId: room.id, userId: session.user.id });
 
 	try {
-		const result = await updateClients(newToken, "membersJoined", {
+		const result = await updateClients(null, "userJoined", {
 			roomId: roomCode,
-			member: session.user,
+			user: session.user,
 		});
 		if (result) return result;
 	} catch (error) {

@@ -47,18 +47,20 @@ export type NewMember = InferInsertModel<typeof member>;
 export const vote = p.pgTable(
 	"votes",
 	{
-		memberId: p
+		userId: p
 			.varchar()
 			.notNull()
 			.references(() => member.id, { onDelete: "cascade" }),
-		storyId: p.varchar().notNull(),
-		// TODO: .references(() => stories.id, { onDelete: "cascade" }),
+		storyId: p
+			.varchar()
+			.notNull()
+			.references(() => story.id, { onDelete: "cascade" }),
 		vote: p.integer(),
 		...timestamps,
 	},
 	t => [
 		p.primaryKey({
-			columns: [t.memberId, t.storyId],
+			columns: [t.userId, t.storyId],
 		}),
 	],
 );
