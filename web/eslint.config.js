@@ -243,7 +243,7 @@ export default defineConfig(
 	{
 		name: "React hooks",
 		files: ["**/*.{ts,tsx,mts,cts}", "**/*.{js,jsx,mjs,cjs}"],
-		extends: [reactHooks.configs.flat.recommended],
+		extends: [reactHooks.configs.flat["recommended-latest"]],
 	},
 	pluginQuery.configs["flat/recommended"],
 	nextPlugin.configs["core-web-vitals"],
