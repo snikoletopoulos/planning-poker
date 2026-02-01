@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
-import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
 import type { Member, Room, Story, Vote } from "@/lib/db/schemas/schema";
@@ -56,7 +55,6 @@ const RoomPage = async ({ params }: PageProps<"/room/[id]">) => {
 	return (
 		<div className="container mx-auto mt-4 min-h-[calc(100vh-4rem)] bg-background">
 			<div className="mx-auto max-w-6xl">
-				<CurrentUserProvider user={session.user}>
 					<RoomProvider
 						room={room}
 						stories={room.stories}
@@ -75,7 +73,6 @@ const RoomPage = async ({ params }: PageProps<"/room/[id]">) => {
 							</div>
 						</div>
 					</RoomProvider>
-				</CurrentUserProvider>
 			</div>
 		</div>
 	);

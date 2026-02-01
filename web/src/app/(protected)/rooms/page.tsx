@@ -1,8 +1,7 @@
+import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
 
 import { Button } from "@/components/ui/Button";
 import {
@@ -22,7 +21,7 @@ export const metadata: Metadata = {
 
 const RoomsPage = async () => {
 	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session) redirect("/login");
+	if (!session) throw new Error("Unauthorized");
 
 	const userRooms = await db.query.member.findMany({
 		where: eq(member.userId, session.user.id),
