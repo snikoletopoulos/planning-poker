@@ -8,9 +8,9 @@ export const id = p
 	.$defaultFn(() => uuid());
 
 export const timestamps = {
-	updatedAt: p.date().notNull().defaultNow(),
+	updatedAt: p.timestamp().notNull().defaultNow(),
 	createdAt: p
-		.date()
+		.timestamp()
 		.notNull()
 		.defaultNow()
 		.$onUpdate(() => sql`getutcdate()`),
