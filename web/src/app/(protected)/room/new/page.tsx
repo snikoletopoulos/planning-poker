@@ -28,16 +28,6 @@ export const metadata: Metadata = {
 	title: "Create room",
 };
 
-const CreateRoomInputSchema = z.object({
-	name: z.string().trim().min(1, "Room name is required"),
-	stories: z.array(
-		z.object({
-			title: z.string().trim().min(1, "Story title is required"),
-			description: z.string().trim(),
-		}),
-	),
-});
-
 const NewRoomPage = () => {
 	const createRoom = async (data: z.infer<typeof CreateRoomInputSchema>) => {
 		"use server";
@@ -107,3 +97,13 @@ const NewRoomPage = () => {
 };
 
 export default NewRoomPage;
+
+const CreateRoomInputSchema = z.object({
+	name: z.string().trim().min(1, "Room name is required"),
+	stories: z.array(
+		z.object({
+			title: z.string().trim().min(1, "Story title is required"),
+			description: z.string().trim(),
+		}),
+	),
+});
