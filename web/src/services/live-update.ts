@@ -3,7 +3,7 @@ import type { Room, Story } from "@/lib/db/schemas/schema";
 
 interface UpdaterData {
 	userVoted: {
-		memberId: User["id"];
+		userId: User["id"];
 		storyId: Story["id"];
 		vote: number | null;
 	};
@@ -14,8 +14,8 @@ interface UpdaterData {
 	uncompleteStory: {
 		storyId: Story["id"];
 	};
-	membersJoined: {
-		member: Pick<User, "id" | "name">;
+	userJoined: {
+		user: Pick<User, "id" | "name">;
 		roomId: Room["id"];
 	};
 }
@@ -49,5 +49,5 @@ const updaterEndpoint = {
 	addStory: "/story",
 	completeStory: "/reveal-story",
 	uncompleteStory: "/unreveal-story",
-	membersJoined: "/join",
+	userJoined: "/join",
 } satisfies Record<keyof UpdaterData, string>;
