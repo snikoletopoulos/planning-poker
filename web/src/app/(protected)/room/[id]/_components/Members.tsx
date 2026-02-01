@@ -27,6 +27,11 @@ export const Members = () => {
 							vote = voteData.vote ?? "?";
 						}
 
+						const memberName = member.name
+							.split(" ")
+							.map((name, index) => (index === 0 ? name : `${name[0] ?? ""}.`))
+							.join(" ");
+
 						return (
 							<div key={member.id} className="flex flex-col items-center">
 								<div className="relative">
@@ -46,7 +51,7 @@ export const Members = () => {
 								</div>
 
 								<span className="mt-2 text-sm font-medium">
-									{member.name}
+									{memberName}
 									{member.id === currentUser.id && " (You)"}
 								</span>
 							</div>
