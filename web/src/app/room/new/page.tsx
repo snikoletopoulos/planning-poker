@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -12,9 +13,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/Card";
-import { createNewUser } from "@/helpers/user";
+import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
-import { rooms, stories as storiesTable, type NewStory } from "@/lib/db/schemas/schema";
+import {
+	member,
+	room,
+	story as storiesTable,
+	type NewStory,
+} from "@/lib/db/schemas/schema";
 import { updateClients } from "@/services/live-update";
 import { CreateRoomForm } from "./_components/CreateRoomForm";
 
@@ -23,8 +29,7 @@ export const metadata: Metadata = {
 };
 
 const CreateRoomInputSchema = z.object({
-	name: z.string().trim().min(1, "Name is required"),
-	roomName: z.string().trim().min(1, "Room name is required"),
+	name: z.string().trim().min(1, "Room name is required"),
 	stories: z.array(
 		z.object({
 			title: z.string().trim().min(1, "Story title is required"),
@@ -37,40 +42,35 @@ const NewRoomPage = () => {
 	const createRoom = async (data: z.infer<typeof CreateRoomInputSchema>) => {
 		"use server";
 
+		const session = await auth.api.getSession({ headers: await headers() });
+		if (!session) return { error: "You must be logged in to join a room" };
+
 		const result = CreateRoomInputSchema.safeParse(data);
 		if (!result.success) return { error: result.error.message };
-		const { name, roomName, stories } = result.data;
+		const { name, stories } = result.data;
 
-		const { roomId } = db.transaction(tx => {
-			const roomsResult = tx
-				.insert(rooms)
-				.values({ name: roomName })
-				.returning()
-				.get();
+		const { roomId } = await db.transaction(async tx => {
+			const rooms = await tx.insert(room).values({ name }).returning();
 
-			const roomId = roomsResult.id;
-			if (!roomId) tx.rollback();
+			const roomId = rooms[0]?.id;
+			if (!roomId) return tx.rollback();
 
 			const storiesData = stories.map(
 				({ title, description }) =>
-					({
-						title,
-						description: description ? description : "",
-						roomId,
-					}) satisfies NewStory,
+					({ title, description, roomId }) satisfies NewStory,
 			);
 
-			tx.insert(storiesTable).values(storiesData).run();
+			await tx.insert(storiesTable).values(storiesData).execute();
 
 			return { roomId };
 		});
 
-		const { user, token } = await createNewUser(name, roomId);
+		await db.insert(member).values({ roomId, userId: session.user.id });
 
 		try {
-			const result = await updateClients(token, "membersJoined", {
+			const result = await updateClients(null, "userJoined", {
 				roomId,
-				member: user,
+				user: session.user,
 			});
 			if (result) return result;
 		} catch (error) {
