@@ -30,7 +30,7 @@ export default defineConfig(
 			/* Enforce camelCase */
 			camelcase: ["error", { allow: ["required_error"] }],
 			/* We allow console for debug and error reporting */
-			// "no-console": "error",
+			"no-console": "off",
 			/* Allow void for async functions */
 			"no-void": ["error", { allowAsStatement: true }],
 			/* Disabled this rule since it doesn't allow re-exporting default from index files */
