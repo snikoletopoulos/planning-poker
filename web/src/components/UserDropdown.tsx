@@ -1,8 +1,7 @@
-"use client";
-
 import { LogOut, Users } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import {
@@ -14,18 +13,18 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import { authClient } from "@/lib/auth/auth-client";
+import { auth } from "@/lib/auth/auth";
 import { ThemeSelector } from "./ThemeToggle";
 
-interface UserDropdownProps {
+export const UserDropdown = ({
+	user,
+}: {
 	user: {
 		name: string;
 		email: string;
 		image?: string | null;
 	};
-}
-
-export const UserDropdown = ({ user }: UserDropdownProps) => {
+}) => {
 	const initials = user.name
 		.split(" ")
 		.slice(0, 2)
@@ -77,7 +76,11 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
 
 				<DropdownMenuItem
 					variant="destructive"
-					onClick={() => authClient.signOut()}
+					onClick={async () => {
+						"use server";
+						await auth.api.signOut({ headers: await headers() });
+						redirect("/login");
+					}}
 				>
 					<LogOut />
 					Log out
