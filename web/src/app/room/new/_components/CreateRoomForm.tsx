@@ -21,7 +21,6 @@ import { Textarea } from "@/components/ui/Textarea";
 import { PasteFromClipboardButton } from "./PasteFromClipboardButton";
 
 const CreateRoomSchema = z.object({
-	roomName: z.string().min(1, "Room name is required"),
 	name: z.string().min(1, "Name is required"),
 	stories: z
 		.array(
@@ -37,7 +36,6 @@ const { formControl, register, handleSubmit, control, setError } =
 	createFormControl({
 		resolver: zodResolver(CreateRoomSchema),
 		defaultValues: {
-			roomName: "",
 			name: "",
 			stories: [],
 		},
@@ -80,32 +78,16 @@ export const CreateRoomForm = ({
 		<FormProvider {...form}>
 			<form onSubmit={handleCreateRoom}>
 				<CardContent className="space-y-6">
-					<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-						<div className="space-y-2">
-							<Label htmlFor="room-name">Room Name</Label>
-							<Input
-								id="room-name"
-								{...register("roomName")}
-								placeholder="Sprint Planning"
-							/>
-							{errors.roomName && (
-								<p className="text-sm text-red-500">
-									{errors.roomName.message}
-								</p>
-							)}
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="name">Your Name</Label>
-							<Input
-								id="name"
-								{...register("name")}
-								placeholder="Enter your name"
-							/>
-							{errors.name && (
-								<p className="text-sm text-red-500">{errors.name.message}</p>
-							)}
-						</div>
+					<div className="space-y-2">
+						<Label htmlFor="room-name">Room Name</Label>
+						<Input
+							id="room-name"
+							{...register("name")}
+							placeholder="Sprint Planning"
+						/>
+						{errors.name && (
+							<p className="text-sm text-red-500">{errors.name.message}</p>
+						)}
 					</div>
 
 					<div>
@@ -166,7 +148,7 @@ export const CreateRoomForm = ({
 export const StoryInput = ({
 	onRemove,
 	index,
-	showDeleteButton = false,
+	showDeleteButton,
 }: {
 	onRemove: () => void;
 	index: number;
